@@ -7,9 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Parameters.h"
 
-@interface ViewController : NSViewController
+@interface RealtimeGraphController : NSViewController
 
+@property (nonatomic) Parameters *params;
 
 @end
 

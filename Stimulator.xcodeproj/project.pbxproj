@@ -8,12 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E12624BB6200ED7E15 /* AppDelegate.m */; };
-		659CC7E52624BB6200ED7E15 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* ViewController.m */; };
+		659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */; };
 		659CC7E72624BB6400ED7E15 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E62624BB6400ED7E15 /* Assets.xcassets */; };
 		659CC7EA2624BB6400ED7E15 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E82624BB6400ED7E15 /* Main.storyboard */; };
 		659CC7ED2624BB6400ED7E15 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7EC2624BB6400ED7E15 /* main.m */; };
 		659CC7F82624BB6400ED7E15 /* StimulatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7F72624BB6400ED7E15 /* StimulatorTests.m */; };
 		659CC8032624BB6400ED7E15 /* StimulatorUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8022624BB6400ED7E15 /* StimulatorUITests.m */; };
+		659CC8122624BB8200ED7E15 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
+		659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81726262C9300ED7E15 /* SimulatorThread.m */; };
+		659CC81B26262E0F00ED7E15 /* Results.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81A26262E0F00ED7E15 /* Results.m */; };
+		659CC81E262631A400ED7E15 /* Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81D262631A400ED7E15 /* Parameters.m */; };
+		659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */; };
+		659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8232626B29000ED7E15 /* GraphShader.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,8 +43,8 @@
 		659CC7DD2624BB6200ED7E15 /* Stimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7E02624BB6200ED7E15 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		659CC7E12624BB6200ED7E15 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		659CC7E32624BB6200ED7E15 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		659CC7E42624BB6200ED7E15 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealtimeGraphController.h; sourceTree = "<group>"; };
+		659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealtimeGraphController.m; sourceTree = "<group>"; };
 		659CC7E62624BB6400ED7E15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		659CC7E92624BB6400ED7E15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		659CC7EB2624BB6400ED7E15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -50,6 +56,18 @@
 		659CC7FE2624BB6400ED7E15 /* StimulatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StimulatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC8022624BB6400ED7E15 /* StimulatorUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StimulatorUITests.m; sourceTree = "<group>"; };
 		659CC8042624BB6400ED7E15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		659CC8102624BB8200ED7E15 /* Simul.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Simul.h; sourceTree = "<group>"; };
+		659CC8112624BB8200ED7E15 /* Simul.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Simul.c; sourceTree = "<group>"; };
+		659CC81626262C9300ED7E15 /* SimulatorThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimulatorThread.h; sourceTree = "<group>"; };
+		659CC81726262C9300ED7E15 /* SimulatorThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimulatorThread.m; sourceTree = "<group>"; };
+		659CC81926262E0F00ED7E15 /* Results.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Results.h; sourceTree = "<group>"; };
+		659CC81A26262E0F00ED7E15 /* Results.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Results.m; sourceTree = "<group>"; };
+		659CC81C262631A400ED7E15 /* Parameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parameters.h; sourceTree = "<group>"; };
+		659CC81D262631A400ED7E15 /* Parameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Parameters.m; sourceTree = "<group>"; };
+		659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealtimeGraphRenderer.h; sourceTree = "<group>"; };
+		659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealtimeGraphRenderer.m; sourceTree = "<group>"; };
+		659CC8222626A95700ED7E15 /* GraphRendererHeaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphRendererHeaders.h; sourceTree = "<group>"; };
+		659CC8232626B29000ED7E15 /* GraphShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GraphShader.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,8 +120,20 @@
 			children = (
 				659CC7E02624BB6200ED7E15 /* AppDelegate.h */,
 				659CC7E12624BB6200ED7E15 /* AppDelegate.m */,
-				659CC7E32624BB6200ED7E15 /* ViewController.h */,
-				659CC7E42624BB6200ED7E15 /* ViewController.m */,
+				659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */,
+				659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */,
+				659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */,
+				659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */,
+				659CC8232626B29000ED7E15 /* GraphShader.metal */,
+				659CC8222626A95700ED7E15 /* GraphRendererHeaders.h */,
+				659CC81926262E0F00ED7E15 /* Results.h */,
+				659CC81A26262E0F00ED7E15 /* Results.m */,
+				659CC81C262631A400ED7E15 /* Parameters.h */,
+				659CC81D262631A400ED7E15 /* Parameters.m */,
+				659CC81626262C9300ED7E15 /* SimulatorThread.h */,
+				659CC81726262C9300ED7E15 /* SimulatorThread.m */,
+				659CC8102624BB8200ED7E15 /* Simul.h */,
+				659CC8112624BB8200ED7E15 /* Simul.c */,
 				659CC7E62624BB6400ED7E15 /* Assets.xcassets */,
 				659CC7E82624BB6400ED7E15 /* Main.storyboard */,
 				659CC7EB2624BB6400ED7E15 /* Info.plist */,
@@ -260,9 +290,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659CC7E52624BB6200ED7E15 /* ViewController.m in Sources */,
+				659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */,
 				659CC7ED2624BB6400ED7E15 /* main.m in Sources */,
+				659CC8122624BB8200ED7E15 /* Simul.c in Sources */,
+				659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */,
+				659CC81E262631A400ED7E15 /* Parameters.m in Sources */,
+				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
 				659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */,
+				659CC81B26262E0F00ED7E15 /* Results.m in Sources */,
+				659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
