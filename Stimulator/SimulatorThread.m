@@ -10,7 +10,7 @@
 #import "Results.h"
 
 static const int cache_size = 500;
-static const int max_results = 100 * 1000; // max number of simulations we should do before we stop.
+static const int max_results = 500 * 1000; // max number of simulations we should do before we stop.
 
 @interface SimulatorThread()
 

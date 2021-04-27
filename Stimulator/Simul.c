@@ -9,18 +9,12 @@
 int get_stoplight_time(struct simul *simulation, int x, int y) {
     // Instead of pre-calculating the stoplight times, we load the dynamically
     int index = x * simulation -> blocks_high + y;
-    int char_idx = index >> 3;
-    int bit_idx = index & 7;
-    if (simulation -> calculated[char_idx]&(1<<bit_idx)) {
-        return simulation -> times[index];
-    } else {
-        // value from 0 to stoplight_time, how do i do that?
+    if (simulation -> times[index] == 0) {
         double value = (double)random()/(double)(RAND_MAX/simulation->stoplight_time);
         simulation -> times[index] = value;
         simulation -> diag.num_randoms += 1;
-        simulation -> calculated[char_idx] |= (1<<bit_idx);
-        return value;
     }
+    return simulation -> times[index];
 }
 
 int stoplight_wait(struct simul *simulation, PolicyResult direction) {
@@ -93,7 +87,7 @@ bool step_simul(struct simul *simulation) {
     }
 
     if (response == Top) {
-        simulation -> diag.move_sequence[simulation -> diag.cur_move /8] |= 1 << (simulation -> diag.cur_move % 8);
+        // simulation -> diag.move_sequence[simulation -> diag.cur_move /8] |= 1 << (simulation -> diag.cur_move % 8);
     }
     simulation -> diag.cur_move += 1;
 
@@ -153,12 +147,14 @@ struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, 
 
     simulation -> x_right = false;
     simulation -> y_top = false;
-
+    
+    if (blocks_wide > 1000 || blocks_high > 1000) {
+        printf("GOT WEIRD PARAMETERS: %d %d\n", blocks_wide, blocks_high);
+    }
     int area = (blocks_wide+1) * (blocks_high+1);
-    int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up
+    // int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up
 
-    simulation -> times = malloc(sizeof(float) * area);
-    simulation -> calculated = calloc(sizeof(char), calculated_size);
+    simulation -> times = calloc(sizeof(float), area);
 
     if (!policy) {
         policy = default_policy;
@@ -172,36 +168,8 @@ struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, 
 
     diag.total_time = simulation -> cur_t;
 
-    free(simulation -> calculated);
     free(simulation -> times);
     free(simulation);
 
     return diag;
-}
-
-int brain() {
-    srandomdev();
-    int s = clock();
-
-    unsigned long long total = 0;
-    unsigned long long waiting = 0;
-    unsigned long long total_randoms = 0;
-
-    int blocks_wide = 50;
-    int blocks_high = 30;
-
-    for (int i = 0; i < 10000; i++) {
-        // simulation is currently at ~100,000x faster than the putative time it measures
-        struct diagnostics result = simulate(30, 50, 50, 50, 100, 2, avoid_waiting_policy);
-        total += result.total_time;
-        waiting += result.time_waiting;
-        total_randoms += result.num_randoms;
-    }
-
-    int j = clock();
-
-    unsigned long long diff = j - s;
-
-    printf("Took %g seconds, %g waiting (%d seconds irl (%g seconds/iteration))! Total randoms %g\n", total/10000.0, waiting/10000.0, diff, diff/10000.0, total_randoms/10000.0);
-    return 0;
 }

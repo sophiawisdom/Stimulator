@@ -10,7 +10,7 @@ typedef PolicyResult (*PolicyFunc)(struct simul * test);
 struct diagnostics {
     int time_waiting;
     double total_time;
-    char move_sequence[128]; // stored as an *inline* sequence of bools. this means max width+height is 1024
+    // char move_sequence[128]; // stored as an *inline* sequence of bools. this means max width+height is 1024
     int cur_move;
     int num_randoms;
 };
@@ -25,7 +25,9 @@ struct simul {
     int street_width;
 
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
-
+    
+    // TODO: remove this if we aren't going to make policies that use it. It's kind of like
+    // cheating to use it as well -- obviously IRL this won't exist.
     float *times; // times[3 * simulation -> blocks_high + 6] is block (x=3, y=6)
     char *calculated;
 
