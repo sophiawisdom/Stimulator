@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		655FCF7A2637D8FD004981A4 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
+		655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655FCF712637D8FB004981A4 /* libsimul.a */; };
 		659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E12624BB6200ED7E15 /* AppDelegate.m */; };
 		659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */; };
 		659CC7E72624BB6400ED7E15 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E62624BB6400ED7E15 /* Assets.xcassets */; };
@@ -14,7 +16,6 @@
 		659CC7ED2624BB6400ED7E15 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7EC2624BB6400ED7E15 /* main.m */; };
 		659CC7F82624BB6400ED7E15 /* StimulatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7F72624BB6400ED7E15 /* StimulatorTests.m */; };
 		659CC8032624BB6400ED7E15 /* StimulatorUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8022624BB6400ED7E15 /* StimulatorUITests.m */; };
-		659CC8122624BB8200ED7E15 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
 		659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81726262C9300ED7E15 /* SimulatorThread.m */; };
 		659CC81B26262E0F00ED7E15 /* Results.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81A26262E0F00ED7E15 /* Results.m */; };
 		659CC81E262631A400ED7E15 /* Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81D262631A400ED7E15 /* Parameters.m */; };
@@ -40,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		655FCF712637D8FB004981A4 /* libsimul.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsimul.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7DD2624BB6200ED7E15 /* Stimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7E02624BB6200ED7E15 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		659CC7E12624BB6200ED7E15 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -71,10 +73,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		655FCF6F2637D8FB004981A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		659CC7DA2624BB6200ED7E15 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +105,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		655FCF7B2637D90A004981A4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		659CC7D42624BB6200ED7E15 = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +119,7 @@
 				659CC7F62624BB6400ED7E15 /* StimulatorTests */,
 				659CC8012624BB6400ED7E15 /* StimulatorUITests */,
 				659CC7DE2624BB6200ED7E15 /* Products */,
+				655FCF7B2637D90A004981A4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,6 +129,7 @@
 				659CC7DD2624BB6200ED7E15 /* Stimulator.app */,
 				659CC7F32624BB6400ED7E15 /* StimulatorTests.xctest */,
 				659CC7FE2624BB6400ED7E15 /* StimulatorUITests.xctest */,
+				655FCF712637D8FB004981A4 /* libsimul.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,7 +182,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		655FCF6D2637D8FB004981A4 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		655FCF702637D8FB004981A4 /* simul */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 655FCF772637D8FB004981A4 /* Build configuration list for PBXNativeTarget "simul" */;
+			buildPhases = (
+				655FCF6D2637D8FB004981A4 /* Headers */,
+				655FCF6E2637D8FB004981A4 /* Sources */,
+				655FCF6F2637D8FB004981A4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = simul;
+			productName = simul;
+			productReference = 655FCF712637D8FB004981A4 /* libsimul.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		659CC7DC2624BB6200ED7E15 /* Stimulator */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 659CC8072624BB6400ED7E15 /* Build configuration list for PBXNativeTarget "Stimulator" */;
@@ -226,6 +272,9 @@
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Sophia Wisdom";
 				TargetAttributes = {
+					655FCF702637D8FB004981A4 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
 					659CC7DC2624BB6200ED7E15 = {
 						CreatedOnToolsVersion = 11.3.1;
 					};
@@ -255,6 +304,7 @@
 				659CC7DC2624BB6200ED7E15 /* Stimulator */,
 				659CC7F22624BB6400ED7E15 /* StimulatorTests */,
 				659CC7FD2624BB6400ED7E15 /* StimulatorUITests */,
+				655FCF702637D8FB004981A4 /* simul */,
 			);
 		};
 /* End PBXProject section */
@@ -286,13 +336,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		655FCF6E2637D8FB004981A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				655FCF7A2637D8FD004981A4 /* Simul.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		659CC7D92624BB6200ED7E15 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */,
 				659CC7ED2624BB6400ED7E15 /* main.m in Sources */,
-				659CC8122624BB8200ED7E15 /* Simul.c in Sources */,
 				659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */,
 				659CC81E262631A400ED7E15 /* Parameters.m in Sources */,
 				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
@@ -345,6 +402,35 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		655FCF782637D8FB004981A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_FAST_MATH = YES;
+				LLVM_LTO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		655FCF792637D8FB004981A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_FAST_MATH = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				LLVM_LTO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
 		659CC8052624BB6400ED7E15 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -563,6 +649,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		655FCF772637D8FB004981A4 /* Build configuration list for PBXNativeTarget "simul" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				655FCF782637D8FB004981A4 /* Debug */,
+				655FCF792637D8FB004981A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		659CC7D82624BB6200ED7E15 /* Build configuration list for PBXProject "Stimulator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

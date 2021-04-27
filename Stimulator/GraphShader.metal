@@ -24,13 +24,13 @@ firstTriangle(uint vertexID [[vertex_id]],
     int num_boxes = *numBoxesPointer;
     int maxHeight = *maxHeightPointer;
     int box_idx = vertexID/3; // Making a box is two triangles == two shader calls
-    float x = (1.8 * float(box_idx)/float(num_boxes)) - .9;
-    float y = -.9;
+    float x = (graph_width * 2 * float(box_idx)/float(num_boxes)) - graph_width;
+    float y = -graph_width;
     int whichPoint = vertexID%3; // 0/1/2
     if (whichPoint == 0) { // topleft
-        y += (float(inputBoxes[box_idx])/float(maxHeight))*1.8;
+        y += (float(inputBoxes[box_idx])/float(maxHeight))*graph_width*2;
     } else if (whichPoint == 2) { // bottomleft
-        x += 1.8/num_boxes;
+        x += (graph_width*2)/num_boxes;
     }
     out.position = vector_float4(x, y, 0.0, 1.0);
     return out;
@@ -48,27 +48,15 @@ secondTriangle(uint vertexID [[vertex_id]],
     float num_boxes = float(*numBoxesPointer);
     float maxHeight = float(*maxHeightPointer);
     int box_idx = vertexID/3; // Making a box is two triangles == two shader calls
-    float x = float(1.8*float(box_idx+1)/num_boxes)-.9;
-    float y = (1.8 * float(inputBoxes[box_idx])/float(maxHeight))-.9;
+    float x = float(graph_width*2*float(box_idx+1)/num_boxes)-graph_width;
+    float y = (graph_width*2 * float(inputBoxes[box_idx])/float(maxHeight))-graph_width;
     int whichPoint = vertexID%3; // 0/1/2
     if (whichPoint == 0) { // topleft
-        x -= 1.8/float(num_boxes);
+        x -= graph_width*2/float(num_boxes);
     } else if (whichPoint == 2) { // bottomright
-        y = -.9;
+        y = -graph_width;
     }
     out.position = vector_float4(x, y, 0.0, 1.0);
-    return out;
-}
-
-vertex RasterizerData
-tickMarks(uint vertexID [[vertex_id]],
-             constant int *inputBoxes [[buffer(GraphRendererInputIndexSquares)]],
-             constant int *numBoxesPointer [[buffer(GraphRendererInputIndexNumBoxes)]],
-             constant int *maxHeightPointer [[buffer(GraphRendererInputIndexBoxTotal)]])
-{
-    RasterizerData out;
-    
-    
     return out;
 }
 

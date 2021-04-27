@@ -14,11 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMin:(int)min Max:(int)max;
 
-@property (nonatomic) int size;
+@property (nonatomic, readonly) int size;
 
 - (void)acquireLock:(void (^)(int * _Nonnull, int, int))lockBlock;
-
-- (void)writeValues: (int *)values count:(int)count;
+- (unsigned long long)writeValues: (int *)values count:(int)count; // Retval is total number of values written.
 
 @end
 

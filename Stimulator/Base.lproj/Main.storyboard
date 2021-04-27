@@ -720,7 +720,7 @@
                             <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gUG-ah-7T6">
                                 <rect key="frame" x="289" y="168" width="96" height="24"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="4.4444444444444446" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="bRF-IW-lRV"/>
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="1" maxValue="10" doubleValue="4.4444444444444446" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="bRF-IW-lRV"/>
                                 <connections>
                                     <action selector="StoplightTimeChanged:" target="XfG-lQ-9wD" id="gvt-F2-Gxm"/>
                                 </connections>

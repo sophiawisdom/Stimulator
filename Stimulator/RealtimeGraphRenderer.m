@@ -65,6 +65,12 @@
         _commandQueue = [_device newCommandQueue];
         
         _renderer = [SKRenderer rendererWithDevice:_device];
+        _renderer.scene = [[SKScene alloc] initWithSize:_viewportSize];
+        SKLabelNode *node = [SKLabelNode labelNodeWithText:@"Hey! This is a really long piece of text!"];
+        node.color = [NSColor blackColor];
+        node.fontSize = 100;
+        node.fontName = @"Arial";
+        [_renderer.scene addChild:node];
     }
     return self;
 }
@@ -74,24 +80,32 @@
     _results = results;
 }
 
-static int num_boxes = 100; // what happens if there are less than 100 possibilites...
-
-- (int *)ranges {
+- (int)num_boxes {
     int min = _params -> _min_time;
     int max = _params -> _max_time;
-    
     int diff = max-min;
-    int *box_ranges = calloc(sizeof(int), num_boxes);
-    for (int i = 0; i < num_boxes-1; i++) {
-        box_ranges[i] += min + (diff/num_boxes * i);
+    
+    int pixel_width = _viewportSize.width * graph_width/3; // at least 3 pixels per bar
+
+    return diff > pixel_width ? pixel_width : diff; // min(diff, pixel_width)
+}
+
+- (int *)ranges: (int)boxes { // not ideal that you're going to have some boxes with different widths...
+    int min = _params -> _min_time;
+    int max = _params -> _max_time;
+    int diff = max-min;
+
+    int *box_ranges = calloc(sizeof(int), boxes);
+    for (int i = 0; i < boxes-1; i++) {
+        box_ranges[i] += min + (diff/boxes * i);
     }
-    box_ranges[num_boxes-1] = max;
+    box_ranges[boxes-1] = max;
     return box_ranges;
 }
 
-- (int *)boxes {
+- (int *)boxes: (int)num_boxes {
     __block int *box_range_values = calloc(sizeof(int), num_boxes);
-    int *ranges = self.ranges;
+    int *ranges = [self ranges:num_boxes];
     
     [_results acquireLock:^(int * _Nonnull results, int min, int max) {
         int range_idx = 0;
@@ -130,14 +144,15 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
     id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
     
     // generate data...
-    int *box_values = self.boxes;
+    int num_boxes = [self num_boxes];
+    int *box_values = [self boxes:num_boxes];
     int box_max = 0;
     for (int i = 0; i < num_boxes; i++) {
         box_max = box_max > box_values[i] ? box_max : box_values[i];
     }
     // printf("box_max is %d\n", box_max);
     
-    [_renderer renderWithViewport:CGRectMake(0, 0, _viewportSize.width, _viewportSize.height) renderCommandEncoder:commandEncoder renderPassDescriptor:renderPassDescriptor commandQueue:_commandQueue];
+    NSPoint mouseLocation = [NSEvent mouseLocation];
         
     // Draw first triangles
     [commandEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.width, _viewportSize.height, 0.0, 1.0 }];
@@ -158,6 +173,8 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
+    
+    [_renderer renderWithViewport:CGRectMake(0, 0, _viewportSize.width, _viewportSize.height) renderCommandEncoder:commandEncoder renderPassDescriptor:renderPassDescriptor commandQueue:_commandQueue];
 
     [commandEncoder endEncoding];
     

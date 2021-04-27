@@ -9,7 +9,8 @@
 #import "SimulatorThread.h"
 #import "Results.h"
 
-int cache_len = 100;
+static const int cache_size = 500;
+static const int max_results = 100 * 1000; // max number of simulations we should do before we stop.
 
 @interface SimulatorThread()
 
@@ -19,12 +20,12 @@ int cache_len = 100;
 
 @implementation SimulatorThread {
     NSThread *_thread;
+    mach_port_t _thread_port;
     Parameters *_params;
     Results *_results;
     int *_results_cache;
     int _cache_used;
     dispatch_semaphore_t _sem;
-    int _total_written;
 }
 
 static int thread_num = 0;
@@ -33,7 +34,7 @@ static int thread_num = 0;
 {
     if (self = [super init]) {
         printf("Starting simulatorthread\n");
-        _results_cache = calloc(sizeof(int), cache_len);
+        _results_cache = calloc(sizeof(int), cache_size);
         _cache_used = 0;
         _sem = dispatch_semaphore_create(1);
         _thread = [[NSThread alloc] initWithBlock:^{
@@ -55,7 +56,10 @@ static int thread_num = 0;
     self.dirty = true;
     _params = params;
     _results = results;
-    // NSLog(@"Writing new params: %@\n", _params);
+
+    if (_thread_port) { // thread is in hibernation, we have to wake it up.
+        thread_resume(_thread_port);
+    }
 }
 
 - (void)pause {
@@ -74,10 +78,10 @@ static int thread_num = 0;
 
 - (void)simulate { // on _thread's thread
     while (1) {
-        if (self.dirty) { // TODO: how long does this take?
+        if (self.dirty) { // TODO: how long does atomically getting dirty take?
             dispatch_semaphore_wait(_sem, DISPATCH_TIME_FOREVER);
             dispatch_semaphore_signal(_sem);
-            memset(_results_cache, 0, cache_len);
+            memset(_results_cache, 0, cache_size);
             _cache_used = 0;
             self.dirty = false;
         }
@@ -86,12 +90,21 @@ static int thread_num = 0;
         
         _results_cache[_cache_used] = result.total_time;
         _cache_used += 1;
-        if (_cache_used == cache_len) {
+        if (_cache_used == cache_size) {
             // write back data. We have a results cache because getting a lock is expensive.
-            // Runs synchronously... should it be async?? expensive to launch another thread etc. etc.
-            [_results writeValues:self->_results_cache count:cache_len];
+            unsigned long long total_written = [_results writeValues:self->_results_cache count:cache_size];
             _cache_used = 0;
-            _total_written += cache_len;
+            if (total_written > max_results) {
+                // If we've already written enough, put the thread in hibernation until the parameters change.
+                // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
+                // but I thought this would be lower-latency, and more accurately describes the intended semantics
+                // ("sleep until something's changed").
+                printf("SUSPENDING THREAD\n");
+                _thread_port = mach_thread_self();
+                thread_suspend(mach_thread_self());
+                _thread_port = MACH_PORT_NULL;
+                printf("UNSUSPENDED\n");
+            }
         }
     }
 }

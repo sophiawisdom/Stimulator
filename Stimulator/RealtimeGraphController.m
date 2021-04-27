@@ -14,7 +14,7 @@
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
 
-int num_threads = 1;
+static const int num_threads = 4;
 
 @implementation RealtimeGraphController {
     NSMutableArray<SimulatorThread *> *_threadpool;
@@ -60,11 +60,6 @@ int num_threads = 1;
     
     _renderer = [[RealtimeGraphRenderer alloc] initWithMTKView:_view];
     _view.delegate = _renderer;
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100000000), dispatch_get_main_queue(), ^{
-        printf("Running after 100ms...\n");
-        self->_view.needsDisplay = true;
-    });
     
     _threadpool = [[NSMutableArray alloc] initWithCapacity:num_threads];
     for (int i = 0; i < num_threads; i++) {

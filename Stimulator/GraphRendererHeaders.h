@@ -17,4 +17,7 @@ typedef enum GraphRendererInputIndex {
     GraphRendererInputIndexBoxTotal = 2
 } GraphRendererInputIndex;
 
+// Sharing constants is difficult because they can change -- easier to share an include.
+#define graph_width (0.9)
+
 #endif /* RendererHeaders_h */
