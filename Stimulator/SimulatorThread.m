@@ -27,6 +27,8 @@ int cache_len = 100;
     int _total_written;
 }
 
+static int thread_num = 0;
+
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -38,6 +40,9 @@ int cache_len = 100;
             printf("Starting thread...\n");
             [self simulate];
         }];
+        _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", thread_num++];
+        _thread.qualityOfService = NSQualityOfServiceBackground;
+        _thread.stackSize = 0x19000; // small stack
         NSLog(@"Created thread, %@", _thread);
     }
     return self;
@@ -50,7 +55,7 @@ int cache_len = 100;
     self.dirty = true;
     _params = params;
     _results = results;
-    printf("Writing new params\n");
+    // NSLog(@"Writing new params: %@\n", _params);
 }
 
 - (void)pause {
@@ -82,16 +87,9 @@ int cache_len = 100;
         _results_cache[_cache_used] = result.total_time;
         _cache_used += 1;
         if (_cache_used == cache_len) {
-            // write back data. We have a results cache because getting a lock
-            // Runs synchronously... should it be async??
-            [_results acquireLock:^(int * _Nonnull results, int min, int max) {
-                for (int i = 0; i < cache_len; i++) {
-                    if (self->_results_cache[i] >= max) {
-                        printf("GOT TOO HIGH RESULT FROM SIMULATE\n");
-                    }
-                    results[self->_results_cache[i]-min] += 1;
-                }
-            }];
+            // write back data. We have a results cache because getting a lock is expensive.
+            // Runs synchronously... should it be async?? expensive to launch another thread etc. etc.
+            [_results writeValues:self->_results_cache count:cache_len];
             _cache_used = 0;
             _total_written += cache_len;
         }

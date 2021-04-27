@@ -79,7 +79,7 @@ bool step_simul(struct simul *simulation) {
         if (simulation -> y_top) { // we're at the top, so we're crossing the street here
             int wait_time = stoplight_wait(simulation, response);
             simulation -> diag.time_waiting += wait_time;
-            simulation->cur_t += simulation->street_width + wait_time;
+            simulation -> cur_t += simulation->street_width + wait_time;
             simulation -> y_top = false;
             simulation -> current_y += 1;
         } else {
@@ -115,20 +115,13 @@ PolicyResult default_policy(struct simul * simulation) {
 
 PolicyResult avoid_waiting_policy(struct simul *simulation) {
     // If we've hit the edges, we have no more options, just continue towards the destination.
-    if (simulation -> current_y+1 == simulation -> blocks_high) {
-        if (!simulation -> y_top) {
-            return Top;
-        }
+    if (simulation -> current_y+1 == simulation -> blocks_high && simulation -> y_top) {
         return Right;
     }
-    else if (simulation -> current_x+1 == simulation -> blocks_wide) {
-        if (!simulation -> x_right) {
-            return Right;
-        }
+    else if (simulation -> current_x+1 == simulation -> blocks_wide && simulation -> x_right) {
         return Top;
     }
 
-    // If we can go top without waiting, go top. Otherwise, go right.
     if (stoplight_wait(simulation, Top) == 0) {
         return Top;
     } else {
@@ -160,7 +153,7 @@ struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, 
     simulation -> x_right = false;
     simulation -> y_top = false;
 
-    int area = blocks_wide * blocks_high;
+    int area = (blocks_wide+1) * (blocks_high+1);
     int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up
 
     simulation -> times = malloc(sizeof(int) * area);

@@ -9,6 +9,8 @@
 #import "RealtimeGraphRenderer.h"
 #import "GraphRendererHeaders.h"
 
+#import <SpriteKit/SpriteKit.h>
+
 @implementation RealtimeGraphRenderer {
     id<MTLDevice> _device;
     id<MTLCommandQueue> _commandQueue;
@@ -19,6 +21,7 @@
     CGSize _viewportSize;
     Results *_results;
     Parameters *_params;
+    SKRenderer *_renderer;
 }
 
 - (instancetype)initWithMTKView:(MTKView *)view {
@@ -60,6 +63,8 @@
 
         // Create the command queue
         _commandQueue = [_device newCommandQueue];
+        
+        _renderer = [SKRenderer rendererWithDevice:_device];
     }
     return self;
 }
@@ -72,8 +77,8 @@
 static int num_boxes = 100; // what happens if there are less than 100 possibilites...
 
 - (int *)ranges {
-    int min = _params.min_time;
-    int max = _params.max_time;
+    int min = _params -> _min_time;
+    int max = _params -> _max_time;
     
     int diff = max-min;
     int *box_ranges = calloc(sizeof(int), num_boxes);
@@ -99,18 +104,18 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
         }
     }];
     
+    /*
     printf("Boxes: ");
     for (int i = 0; i < num_boxes; i++) {
         printf("%d ", box_range_values[i]);
     }
     printf("\n");
+     */
 
     return box_range_values;
 }
 
-- (void)drawInMTKView:(nonnull MTKView *)view {
-    printf("Time to update the view's contents...\n");
-    
+- (void)drawInMTKView:(nonnull MTKView *)view {    
     if (!_params || !_results) {
         printf("Refusing to render...\n");
         return;
@@ -130,8 +135,10 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
     for (int i = 0; i < num_boxes; i++) {
         box_max = box_max > box_values[i] ? box_max : box_values[i];
     }
-    printf("box_max is %d\n", box_max);
+    // printf("box_max is %d\n", box_max);
     
+    [_renderer renderWithViewport:CGRectMake(0, 0, _viewportSize.width, _viewportSize.height) renderCommandEncoder:commandEncoder renderPassDescriptor:renderPassDescriptor commandQueue:_commandQueue];
+        
     // Draw first triangles
     [commandEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.width, _viewportSize.height, 0.0, 1.0 }];
     [commandEncoder setRenderPipelineState:_firstTrianglePipeline];
@@ -140,9 +147,6 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
                            length:sizeof(int)*num_boxes
                           atIndex:GraphRendererInputIndexSquares];
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
-    [commandEncoder setVertexBytes:&_viewportSize
-                           length:sizeof(_viewportSize)
-                          atIndex:GraphRendererInputIndexViewportSize];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
     
@@ -152,9 +156,6 @@ static int num_boxes = 100; // what happens if there are less than 100 possibili
                            length:sizeof(int)*num_boxes
                           atIndex:GraphRendererInputIndexSquares];
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
-    [commandEncoder setVertexBytes:&_viewportSize
-                           length:sizeof(_viewportSize)
-                          atIndex:GraphRendererInputIndexViewportSize];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
 

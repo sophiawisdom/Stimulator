@@ -21,12 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
     @public int _stoplight_time;
     @public int _street_width;
     @public PolicyFunc _policy;
+
+    @public int _min_time;
+    @public int _max_time;
 };
 
 - (instancetype)initWithBlocksWide:(int)blocksWide BlocksHigh: (int)blocksHigh blockHeight: (int)blockHeight blockWidth: (int)blockWidth stoplightTime: (int)stoplightTime streetWidth: (int)streetWidth policy: (PolicyFunc)policy;
-
-- (int)max_time;
-- (int)min_time;
 
 @end
 

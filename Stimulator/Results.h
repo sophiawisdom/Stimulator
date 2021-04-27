@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)acquireLock:(void (^)(int * _Nonnull, int, int))lockBlock;
 
+- (void)writeValues: (int *)values count:(int)count;
+
 @end
 
 NS_ASSUME_NONNULL_END

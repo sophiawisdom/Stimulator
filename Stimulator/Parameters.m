@@ -8,10 +8,7 @@
 
 #import "Parameters.h"
 
-@implementation Parameters {
-    int _max_time;
-    int _min_time;
-}
+@implementation Parameters
 
 - (instancetype)initWithBlocksWide:(int)blocksWide BlocksHigh:(int)blocksHigh blockHeight:(int)blockHeight blockWidth:(int)blockWidth stoplightTime:(int)stoplightTime streetWidth:(int)streetWidth policy: (PolicyFunc)policy{
     if (self = [super init]) {
@@ -22,22 +19,16 @@
         _stoplight_time = stoplightTime;
         _street_width = streetWidth;
         _policy = policy;
+        
+        _min_time = _blocks_wide*_block_width + _blocks_high*_block_height + _street_width*(_blocks_high-1+_blocks_wide-1);
+        _max_time = _min_time + _stoplight_time*2*(_blocks_high+_blocks_wide);
     }
     return self;
 }
 
-- (int)max_time {
-    if (_max_time == 0) {
-        _max_time = self.min_time + _stoplight_time*2*(_blocks_high+_blocks_wide); // this is a shaky calculation...
-    }
-    return _max_time;
-}
-
-- (int)min_time {
-    if (_min_time == 0) {
-        _min_time = _blocks_wide*_block_width + _blocks_high*_block_height + _street_width*(_blocks_high+_blocks_wide);
-    }
-    return _min_time;
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"{blocks_wide: %d, blocks_high: %d, block_height: %d, block_width: %d, stoplight_time: %d, street_width: %d, policy: %p}", _blocks_wide, _blocks_high, _block_height, _block_width, _stoplight_time, _street_width, _policy];
 }
 
 @end

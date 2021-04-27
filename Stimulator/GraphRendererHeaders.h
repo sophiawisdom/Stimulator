@@ -13,9 +13,8 @@
 
 typedef enum GraphRendererInputIndex {
     GraphRendererInputIndexSquares = 0,
-    GraphRendererInputIndexViewportSize = 1,
-    GraphRendererInputIndexNumBoxes = 2,
-    GraphRendererInputIndexBoxTotal = 3
+    GraphRendererInputIndexNumBoxes = 1,
+    GraphRendererInputIndexBoxTotal = 2
 } GraphRendererInputIndex;
 
 #endif /* RendererHeaders_h */

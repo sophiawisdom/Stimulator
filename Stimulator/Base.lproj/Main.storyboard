@@ -706,13 +706,66 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="RealtimeGraphController" sceneMemberID="viewController">
                     <customView key="view" id="oik-1Y-4BS" customClass="MTKView">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="508" height="300"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <subviews>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SaD-4n-g3Q">
+                                <rect key="frame" x="289" y="241" width="96" height="19"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="Et6-Hv-prn"/>
+                                <connections>
+                                    <action selector="HeightChanged:" target="XfG-lQ-9wD" id="mIi-WY-CDa"/>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gUG-ah-7T6">
+                                <rect key="frame" x="289" y="168" width="96" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="10" doubleValue="4.4444444444444446" tickMarkPosition="below" numberOfTickMarks="10" allowsTickMarkValuesOnly="YES" sliderType="linear" id="bRF-IW-lRV"/>
+                                <connections>
+                                    <action selector="StoplightTimeChanged:" target="XfG-lQ-9wD" id="gvt-F2-Gxm"/>
+                                </connections>
+                            </slider>
+                            <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iGS-mm-svE">
+                                <rect key="frame" x="289" y="210" width="96" height="19"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="inx-Rb-6iF"/>
+                                <connections>
+                                    <action selector="WidthChanged:" target="XfG-lQ-9wD" id="drk-yi-ivV"/>
+                                </connections>
+                            </slider>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n6J-oz-WDz">
+                                <rect key="frame" x="319" y="257" width="45" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Height" id="slJ-AL-13Z">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BZU-3d-JAj">
+                                <rect key="frame" x="315" y="233" width="40" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Width" id="tBs-wB-uzc">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="usQ-zo-kxW">
+                                <rect key="frame" x="293" y="188" width="89" height="16"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Stoplight time" id="klo-5T-wuO">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
                     </customView>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="46" y="655"/>
         </scene>
     </scenes>
 </document>
