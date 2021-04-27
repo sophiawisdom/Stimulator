@@ -49,7 +49,7 @@
         cur_results = self -> _num_results;
         for (int i = 0; i < count; i++) {
             if (values[i] < min || values[i] > max) {
-                printf("result is %d\n", values[i]);
+                printf("result is %d (min %d max %d)\n", values[i], min, max);
             }
             results[values[i]-min] += 1;
         }

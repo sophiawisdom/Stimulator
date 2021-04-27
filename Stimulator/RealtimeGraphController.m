@@ -33,9 +33,9 @@ static const int num_threads = 4;
 }
 
 - (IBAction)StoplightTimeChanged:(NSSlider *)sender {
-    if (sender.intValue != _params -> _stoplight_time) {
+    if (sender.floatValue != _params -> _stoplight_time) {
         // printf("Modifying stoplight time, is now %d\n", sender.intValue);
-        self.params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:_params ->_block_width stoplightTime:sender.intValue streetWidth:_params -> _street_width policy:_params -> _policy];
+        self.params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:_params ->_block_width stoplightTime:sender.floatValue streetWidth:_params -> _street_width policy:_params -> _policy];
     }
 }
 
@@ -65,21 +65,7 @@ static const int num_threads = 4;
     for (int i = 0; i < num_threads; i++) {
         [_threadpool addObject:[[SimulatorThread alloc] init]];
     }
-    self.params = [[Parameters alloc] initWithBlocksWide:30 BlocksHigh:50 blockHeight:10 blockWidth:10 stoplightTime:2 streetWidth:5 policy:avoid_waiting_policy];
-    
-    /*
-    [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        [self->_results acquireLock:^(int * _Nonnull results, int _results_len) {
-            unsigned long long total = 0;
-            double number = 0;
-            for (int i = 0; i < _results_len; i++) {
-                number += results[i];
-                total += results[i]*i;
-            }
-            printf("total is %llu, number is %g is %g\n", total, number, total/number);
-        }];
-    }];
-     */
+    self.params = [[Parameters alloc] initWithBlocksWide:30 BlocksHigh:50 blockHeight:10 blockWidth:10 stoplightTime:2 streetWidth:5 policy:default_policy];
 }
 
 - (void)setParams:(Parameters *)params {

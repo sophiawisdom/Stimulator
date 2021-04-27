@@ -14,7 +14,8 @@ int get_stoplight_time(struct simul *simulation, int x, int y) {
     if (simulation -> calculated[char_idx]&(1<<bit_idx)) {
         return simulation -> times[index];
     } else {
-        int value = simulation -> stoplight_time + (random() % simulation -> stoplight_time);
+        // value from 0 to stoplight_time, how do i do that?
+        double value = (double)random()/(double)(RAND_MAX/simulation->stoplight_time);
         simulation -> times[index] = value;
         simulation -> diag.num_randoms += 1;
         simulation -> calculated[char_idx] |= (1<<bit_idx);
@@ -156,7 +157,7 @@ struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, 
     int area = (blocks_wide+1) * (blocks_high+1);
     int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up
 
-    simulation -> times = malloc(sizeof(int) * area);
+    simulation -> times = malloc(sizeof(float) * area);
     simulation -> calculated = calloc(sizeof(char), calculated_size);
 
     if (!policy) {

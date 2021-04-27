@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
     @public int _blocks_high;
     @public int _block_height;
     @public int _block_width;
-    @public int _stoplight_time;
+    @public float _stoplight_time;
     @public int _street_width;
     @public PolicyFunc _policy;
 

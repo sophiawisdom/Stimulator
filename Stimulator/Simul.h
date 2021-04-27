@@ -9,7 +9,7 @@ typedef PolicyResult (*PolicyFunc)(struct simul * test);
 
 struct diagnostics {
     int time_waiting;
-    int total_time;
+    double total_time;
     char move_sequence[128]; // stored as an *inline* sequence of bools. this means max width+height is 1024
     int cur_move;
     int num_randoms;
@@ -26,7 +26,7 @@ struct simul {
 
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
 
-    int *times; // times[3 * simulation -> blocks_high + 6] is block (x=3, y=6)
+    float *times; // times[3 * simulation -> blocks_high + 6] is block (x=3, y=6)
     char *calculated;
 
     int current_x; // start at 0, 0

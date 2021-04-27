@@ -37,13 +37,10 @@ static int thread_num = 0;
         _results_cache = calloc(sizeof(int), cache_size);
         _cache_used = 0;
         _sem = dispatch_semaphore_create(1);
-        _thread = [[NSThread alloc] initWithBlock:^{
-            printf("Starting thread...\n");
-            [self simulate];
-        }];
+        _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", thread_num++];
         _thread.qualityOfService = NSQualityOfServiceBackground;
-        _thread.stackSize = 0x19000; // small stack
+        _thread.stackSize = 0x19000; // small stack, we should only be going one or two layers deep of recursion.
         NSLog(@"Created thread, %@", _thread);
     }
     return self;
@@ -99,11 +96,11 @@ static int thread_num = 0;
                 // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
                 // but I thought this would be lower-latency, and more accurately describes the intended semantics
                 // ("sleep until something's changed").
-                printf("SUSPENDING THREAD\n");
+                printf("SUSPENDING THREAD %s\n", _thread.name.UTF8String);
                 _thread_port = mach_thread_self();
                 thread_suspend(mach_thread_self());
                 _thread_port = MACH_PORT_NULL;
-                printf("UNSUSPENDED\n");
+                printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
             }
         }
     }
