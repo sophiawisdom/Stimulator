@@ -8,9 +8,10 @@
 
 #import "SimulatorThread.h"
 #import "Results.h"
+#include <libkern/OSAtomic.h>
 
 static const int cache_size = 500;
-static const int max_results = 500 * 1000; // max number of simulations we should do before we stop.
+static const int checking_time = 400; // from what time it will check contention
 
 @interface SimulatorThread()
 
@@ -23,7 +24,7 @@ static const int max_results = 500 * 1000; // max number of simulations we shoul
     mach_port_t _thread_port;
     Parameters *_params;
     Results *_results;
-    int *_results_cache;
+    float *_results_cache;
     int _cache_used;
     dispatch_semaphore_t _sem;
 }
@@ -34,7 +35,7 @@ static int thread_num = 0;
 {
     if (self = [super init]) {
         printf("Starting simulatorthread\n");
-        _results_cache = calloc(sizeof(int), cache_size);
+        _results_cache = calloc(sizeof(float), cache_size);
         _cache_used = 0;
         _sem = dispatch_semaphore_create(1);
         _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
@@ -47,15 +48,15 @@ static int thread_num = 0;
 }
 
 - (void)newParams:(Parameters *)params andResults: (Results *)results { // main thread
-    if (![_thread isExecuting]) {
-        [_thread start];
-    }
     self.dirty = true;
     _params = params;
     _results = results;
 
-    if (_thread_port) { // thread is in hibernation, we have to wake it up.
+    if (_thread_port) { // wake thread up if it's been suspended
         thread_resume(_thread_port);
+    }
+    if (![_thread isExecuting]) {
+        [_thread start];
     }
 }
 
@@ -71,11 +72,27 @@ static int thread_num = 0;
 - (void)dealloc
 {
     free(_results_cache);
+    mach_port_destroy(mach_task_self(), _thread_port);
+}
+
+- (void)flush_cache {
+    long long total_written = [_results writeValues:self->_results_cache count:_cache_used];
+    _cache_used = 0;
+    if (total_written == -1) {
+        // If we've already written enough, put the thread in hibernation until the parameters change.
+        // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
+        // but I thought this would be lower-latency, and more accurately describes the intended semantics
+        // ("sleep until something's changed").
+        printf("SUSPENDING THREAD %s\n", _thread.name.UTF8String);
+        thread_suspend(_thread_port);
+        printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
+    }
 }
 
 - (void)simulate { // on _thread's thread
+    _thread_port = mach_thread_self();
     while (1) {
-        if (self.dirty) { // TODO: how long does atomically getting dirty take?
+        if (self.dirty) { // this line takes ~1/1000th of the overall time
             dispatch_semaphore_wait(_sem, DISPATCH_TIME_FOREVER);
             dispatch_semaphore_signal(_sem);
             memset(_results_cache, 0, cache_size);
@@ -85,23 +102,10 @@ static int thread_num = 0;
 
         struct diagnostics result = simulate(_params -> _blocks_wide, _params -> _blocks_high, _params -> _block_height, _params -> _block_width, _params -> _stoplight_time, _params -> _street_width, _params -> _policy);
         
-        _results_cache[_cache_used] = result.total_time;
-        _cache_used += 1;
+        _results_cache[_cache_used++] = (float)result.total_time;
+
         if (_cache_used == cache_size) {
-            // write back data. We have a results cache because getting a lock is expensive.
-            unsigned long long total_written = [_results writeValues:self->_results_cache count:cache_size];
-            _cache_used = 0;
-            if (total_written > max_results) {
-                // If we've already written enough, put the thread in hibernation until the parameters change.
-                // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
-                // but I thought this would be lower-latency, and more accurately describes the intended semantics
-                // ("sleep until something's changed").
-                printf("SUSPENDING THREAD %s\n", _thread.name.UTF8String);
-                _thread_port = mach_thread_self();
-                thread_suspend(mach_thread_self());
-                _thread_port = MACH_PORT_NULL;
-                printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
-            }
+            [self flush_cache];
         }
     }
 }

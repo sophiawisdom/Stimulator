@@ -547,11 +547,15 @@
 				CODE_SIGN_ENTITLEMENTS = Stimulator/Stimulator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_FAST_MATH = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Stimulator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LLVM_LTO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.tweaks.Stimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -564,11 +568,15 @@
 				CODE_SIGN_ENTITLEMENTS = Stimulator/Stimulator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_FAST_MATH = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Stimulator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LLVM_LTO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.tweaks.Stimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

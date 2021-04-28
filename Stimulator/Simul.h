@@ -36,7 +36,7 @@ struct simul {
     int current_y;
     bool y_top; // true: we're at the top of the block. false: we're at the bottom of the block
 
-    int cur_t;
+    float cur_t;
 
     int stoplight_time;
 

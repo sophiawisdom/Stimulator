@@ -7,12 +7,13 @@
 //
 
 #import "Results.h"
+#import "SimulatorThread.h"
 
 @implementation Results {
-    int *_results; // length of blocks_wide*block_width + blocks_high*block_height + (stoplight_time + street_wide)*(blocks_high+blocks_wide), which should be maximum time
+    float *_results; // length of blocks_wide*block_width + blocks_high*block_height + (stoplight_time + street_wide)*(blocks_high+blocks_wide), which should be maximum time
     int _min;
     int _max;
-    unsigned long long _num_results;
+    long long _num_results;
     dispatch_semaphore_t _results_lock;
 }
 
@@ -26,7 +27,7 @@
         
         // Acquire lock to use these
         _num_results = 0;
-        _results = calloc(sizeof(int), max-min);
+        _results = calloc(sizeof(float), max_results);
     }
     return self;
 }
@@ -35,23 +36,31 @@
     return _max-_min;
 }
 
-- (void)acquireLock:(void (^)(int * _Nonnull, int, int))lockBlock {
+- (void)acquireLock:(void (^)(float * _Nonnull, int, int, long long))lockBlock {
     dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER); // DISPATCH_TIME_FOREVER could lead
     // to problems, but for now it serves to simplify things because it can't fail.
-    lockBlock(_results, _min, _max);
+    lockBlock(_results, _min, _max, _num_results);
     dispatch_semaphore_signal(_results_lock);
 }
 
-- (unsigned long long)writeValues: (int *)values count:(int)count {
-    __block unsigned long long cur_results = 0;
-    [self acquireLock:^(int * _Nonnull results, int min, int max) {
-        self -> _num_results += count;
-        cur_results = self -> _num_results;
-        for (int i = 0; i < count; i++) {
-            if (values[i] <= min || values[i] >= max) {
-                printf("result is %d (min %d max %d)\n", values[i], min, max);
-            }
-            results[values[i]-min] += 1;
+- (void)readValues:(void (^)(float * _Nonnull, int, int, long long))readBlock {
+    // The insight here is that we don't need the most up-to-date or accurate value for _num_results,
+    // and we don't need a lock on the underlying array, because it's append-only. Hopefully this should
+    // meaningfully reduce contention
+    readBlock(_results, _min, _max, _num_results);
+}
+
+- (long long)writeValues: (float *)values count:(int)count {
+    __block long long cur_results = 0;
+    // To think about: could we bring the memcpy outside of the lock?
+    [self acquireLock:^(float * restrict _Nonnull results, int min, int max, long long num_results) {
+        if (self -> _num_results + count > max_results) {
+            // We already have enough results, no need for more.
+            cur_results = -1;
+        } else {
+            memcpy(&results[self -> _num_results], values, sizeof(float) * count);
+            self -> _num_results += count;
+            cur_results = self -> _num_results;
         }
     }];
     return cur_results;

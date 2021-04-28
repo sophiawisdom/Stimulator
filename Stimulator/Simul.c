@@ -2,17 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 #include "Simul.h"
 
 #undef DEBUG
 
-int get_stoplight_time(struct simul *simulation, int x, int y) {
+double get_stoplight_time(struct simul *simulation, int x, int y) {
     // Instead of pre-calculating the stoplight times, we load the dynamically
     int index = x * simulation -> blocks_high + y;
     if (simulation -> times[index] == 0) {
         double value = (double)random()/(double)(RAND_MAX/simulation->stoplight_time);
         simulation -> times[index] = value;
-        simulation -> diag.num_randoms += 1;
+        return value;
     }
     return simulation -> times[index];
 }
@@ -23,10 +24,10 @@ int stoplight_wait(struct simul *simulation, PolicyResult direction) {
 #ifdef DEBUG
     printf("effective_x is %d, effective_y is %d\n", effective_x, effective_y);
 #endif
-    int stoplight_time = get_stoplight_time(simulation, effective_x, effective_y);
+    double stoplight_time = get_stoplight_time(simulation, effective_x, effective_y);
 
-    int current_time = simulation -> cur_t % (simulation -> stoplight_time * 3);
-    int cycle_time = simulation -> stoplight_time * 3;
+    float current_time = fmodf(simulation -> cur_t, (simulation -> stoplight_time * 3.0f));
+    float cycle_time = simulation -> stoplight_time * 3;
     if (direction == Top) {
         if (current_time <= stoplight_time) {
             return 0;

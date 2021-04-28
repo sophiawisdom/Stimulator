@@ -16,8 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) int size;
 
-- (void)acquireLock:(void (^)(int * _Nonnull, int, int))lockBlock;
-- (unsigned long long)writeValues: (int *)values count:(int)count; // Retval is total number of values written.
+// - (void)acquireLock:(void (^)(float * _Nonnull, int, int, long long))lockBlock;
+- (void)readValues:(void (^)(float * _Nonnull, int, int, long long))readBlock;
+- (long long)writeValues: (float *)values count:(int)count; // Retval is total number of values written, or -1 in case of error. This is a simple wrapper over acquireLock.
 
 @end
 

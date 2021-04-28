@@ -8,8 +8,19 @@
 
 #import "RealtimeGraphRenderer.h"
 #import "GraphRendererHeaders.h"
+#import "SimulatorThread.h"
 
 #import <SpriteKit/SpriteKit.h>
+
+// Used for qsort()
+int float_compar(float *first, float *second) {
+    if (first < second) {
+        return -1;
+    } else if (second > first) {
+        return 1;
+    }
+    return 0;
+}
 
 @implementation RealtimeGraphRenderer {
     id<MTLDevice> _device;
@@ -66,11 +77,13 @@
         
         _renderer = [SKRenderer rendererWithDevice:_device];
         _renderer.scene = [[SKScene alloc] initWithSize:_viewportSize];
+        /*
         SKLabelNode *node = [SKLabelNode labelNodeWithText:@"Hey! This is a really long piece of text!"];
         node.color = [NSColor blackColor];
         node.fontSize = 100;
         node.fontName = @"Arial";
         [_renderer.scene addChild:node];
+         */
     }
     return self;
 }
@@ -81,6 +94,7 @@
 }
 
 - (int)num_boxes {
+    return _viewportSize.width * graph_width/3;
     int min = _params -> _min_time;
     int max = _params -> _max_time;
     int diff = max-min;
@@ -90,31 +104,16 @@
     return diff > pixel_width ? pixel_width : diff; // min(diff, pixel_width)
 }
 
-- (int *)ranges: (int)boxes { // not ideal that you're going to have some boxes with different widths...
-    int min = _params -> _min_time;
-    int max = _params -> _max_time;
-    int diff = max-min;
-
-    int *box_ranges = calloc(sizeof(int), boxes);
-    for (int i = 0; i < boxes-1; i++) {
-        box_ranges[i] += min + (diff/boxes * i);
-    }
-    box_ranges[boxes-1] = max;
-    return box_ranges;
-}
 
 - (int *)boxes: (int)num_boxes {
     __block int *box_range_values = calloc(sizeof(int), num_boxes);
-    int *ranges = [self ranges:num_boxes];
+    // printf("num_boxes is %d\n", nu)
     
-    [_results acquireLock:^(int * _Nonnull results, int min, int max) {
-        int range_idx = 0;
-        for (int i = 0; i < max-min; i++) {
-            int result = results[i];
-            while (min+i > ranges[range_idx]) {
-                range_idx++;
-            }
-            box_range_values[range_idx] += result;
+    [_results readValues:^(float * _Nonnull results, int min, int max, long long num_results) {
+        for (int i = 0; i < num_results; i++) {
+            float result = results[i] - min;
+            int index = (int)(result*num_boxes)/(max-min);
+            box_range_values[index] += 1;
         }
     }];
     
