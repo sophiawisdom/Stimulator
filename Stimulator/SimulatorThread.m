@@ -22,12 +22,12 @@ static const int cache_size = 500;
     mach_port_t _thread_port;
     Parameters *_params;
     Results *_results;
-    float *_results_cache;
+    int *_results_cache;
     int _cache_used;
     dispatch_semaphore_t _sem;
 }
 
-static int thread_num = 0;
+static volatile int thread_num = 0;
 
 - (instancetype)init
 {
@@ -100,8 +100,7 @@ static int thread_num = 0;
 
         struct diagnostics result = simulate(_params -> _blocks_wide, _params -> _blocks_high, _params -> _block_height, _params -> _block_width, _params -> _stoplight_time, _params -> _street_width, _params -> _policy);
         
-        _results_cache[_cache_used++] = (float)result.total_time;
-
+        _results_cache[_cache_used++] = (int)result.total_time;
         if (_cache_used == cache_size) {
             [self flush_cache];
         }

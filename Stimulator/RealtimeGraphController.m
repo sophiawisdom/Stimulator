@@ -75,7 +75,7 @@ static const int num_threads = 4;
 }
 
 - (void)invalidate {
-    _results = [[Results alloc] initWithMin:_params -> _min_time Max:_params -> _max_time];
+    _results = [[Results alloc] initWithMin:_params -> _min_time Max:_params -> _max_time MaxWriters:num_threads];
     [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
         [thread newParams:_params andResults:_results];
     }];

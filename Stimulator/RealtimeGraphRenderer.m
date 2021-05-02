@@ -102,11 +102,10 @@ int float_compar(float *first, float *second) {
     __block int *box_range_values = calloc(sizeof(int), num_boxes);
     // printf("num_boxes is %d\n", nu)
 
-    [_results readValues:^(float * _Nonnull results, int min, int max, long long num_results) {
-        for (int i = 0; i < num_results; i++) {
-            float result = results[i] - min;
-            int index = (int)(result*num_boxes)/(max-min);
-            box_range_values[index] += 1;
+    [_results readValues:^(int * _Nonnull results, int min, int max) {
+        for (int i = 0; i < max-min; i++) {
+            int index = (i*num_boxes)/(max-min);
+            box_range_values[index] += results[i];
         }
     }];
     
@@ -143,9 +142,7 @@ int float_compar(float *first, float *second) {
         box_max = box_max > box_values[i] ? box_max : box_values[i];
     }
     // printf("box_max is %d\n", box_max);
-    
-    NSPoint mouseLocation = [NSEvent mouseLocation];
-        
+
     // Draw first triangles
     [commandEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.width, _viewportSize.height, 0.0, 1.0 }];
     [commandEncoder setRenderPipelineState:_firstTrianglePipeline];

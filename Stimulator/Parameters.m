@@ -10,7 +10,7 @@
 
 @implementation Parameters
 
-- (instancetype)initWithBlocksWide:(int)blocksWide BlocksHigh:(int)blocksHigh blockHeight:(int)blockHeight blockWidth:(int)blockWidth stoplightTime:(int)stoplightTime streetWidth:(int)streetWidth policy: (PolicyFunc)policy{
+- (instancetype)initWithBlocksWide:(int)blocksWide BlocksHigh:(int)blocksHigh blockHeight:(float)blockHeight blockWidth:(float)blockWidth stoplightTime:(float)stoplightTime streetWidth:(float)streetWidth policy: (PolicyFunc)policy {
     if (self = [super init]) {
         _blocks_wide = blocksWide;
         _blocks_high = blocksHigh;
@@ -28,7 +28,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"{blocks_wide: %d, blocks_high: %d, block_height: %d, block_width: %d, stoplight_time: %f, street_width: %d, policy: %p}", _blocks_wide, _blocks_high, _block_height, _block_width, _stoplight_time, _street_width, _policy];
+    return [NSString stringWithFormat:@"{blocks_wide: %d, blocks_high: %d, block_height: %f, block_width: %f, stoplight_time: %f, street_width: %f, policy: %p}", _blocks_wide, _blocks_high, _block_height, _block_width, _stoplight_time, _street_width, _policy];
 }
 
 @end

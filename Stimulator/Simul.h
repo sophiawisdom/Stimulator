@@ -18,11 +18,11 @@ struct diagnostics {
 struct simul {
     struct diagnostics diag;
 
-    int block_height;
-    int block_width;
+    float block_height;
+    float block_width;
     int blocks_high;
     int blocks_wide;
-    int street_width;
+    float street_width;
 
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
     
@@ -38,12 +38,12 @@ struct simul {
 
     float cur_t;
 
-    int stoplight_time;
+    float stoplight_time;
 
     PolicyFunc policy;
 };
 
-struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, int block_width, int stoplight_time, int street_width, PolicyFunc policy);
+struct diagnostics simulate(int blocks_wide, int blocks_high, float block_height, float block_width, float stoplight_time, float street_width, PolicyFunc policy);
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
 PolicyResult default_policy(struct simul *simulation);

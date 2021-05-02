@@ -63,7 +63,7 @@
 		659CC81626262C9300ED7E15 /* SimulatorThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimulatorThread.h; sourceTree = "<group>"; };
 		659CC81726262C9300ED7E15 /* SimulatorThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimulatorThread.m; sourceTree = "<group>"; };
 		659CC81926262E0F00ED7E15 /* Results.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Results.h; sourceTree = "<group>"; };
-		659CC81A26262E0F00ED7E15 /* Results.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Results.m; sourceTree = "<group>"; };
+		659CC81A26262E0F00ED7E15 /* Results.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Results.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		659CC81C262631A400ED7E15 /* Parameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parameters.h; sourceTree = "<group>"; };
 		659CC81D262631A400ED7E15 /* Parameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Parameters.m; sourceTree = "<group>"; };
 		659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealtimeGraphRenderer.h; sourceTree = "<group>"; };
@@ -548,6 +548,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_FAST_MATH = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Stimulator/Info.plist;
@@ -569,6 +570,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_FAST_MATH = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Stimulator/Info.plist;

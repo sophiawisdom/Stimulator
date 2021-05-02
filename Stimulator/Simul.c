@@ -125,7 +125,7 @@ PolicyResult avoid_waiting_policy(struct simul *simulation) {
     }
 }
 
-struct diagnostics simulate(int blocks_wide, int blocks_high, int block_height, int block_width, int stoplight_time, int street_width, PolicyFunc policy) {
+struct diagnostics simulate(int blocks_wide, int blocks_high, float block_height, float block_width, float stoplight_time, float street_width, PolicyFunc policy) {
     struct simul *simulation = malloc(sizeof(struct simul));
 
     simulation -> cur_t = 0;
