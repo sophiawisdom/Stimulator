@@ -100,7 +100,7 @@ static volatile int thread_num = 0;
 
         struct diagnostics result = simulate(_params -> _blocks_wide, _params -> _blocks_high, _params -> _block_height, _params -> _block_width, _params -> _stoplight_time, _params -> _street_width, _params -> _policy);
         
-        _results_cache[_cache_used++] = (int)result.total_time;
+        _results_cache[_cache_used++] = result.total_time * 8;
         if (_cache_used == cache_size) {
             [self flush_cache];
         }

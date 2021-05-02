@@ -8,7 +8,6 @@
 
 #import "Results.h"
 #import "SimulatorThread.h"
-// #import <atomic.h>
 
 @implementation Results {
     _Atomic int *_results; // length of blocks_wide*block_width + blocks_high*block_height + (stoplight_time + street_wide)*(blocks_high+blocks_wide), which should be maximum time
@@ -24,13 +23,13 @@
     if (self) {
         _min = min;
         _max = max;
-        
+
         _results_lock = dispatch_semaphore_create(max_writers);
         _max_writers = max_writers;
-        
+
         // Acquire lock to use these
         _num_results = 0;
-        _results = calloc(sizeof(int), max-min);
+        _results = calloc(sizeof(int), (max-min)*8);
     }
     return self;
 }
@@ -58,13 +57,13 @@
     dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
     long long sum = 0;
     for (int i = 0; i < count; i++) {
-        _results[values[i]-_min] += 1;
+        _results[values[i]-(_min*8)] += 1;
         sum += values[i];
     }
     
     _num_results += sum; // hopefully reduce write traffic to _num_results...
     dispatch_semaphore_signal(_results_lock);
-    return _num_results;
+    return _num_results/8;
 }
 
 - (void)dealloc

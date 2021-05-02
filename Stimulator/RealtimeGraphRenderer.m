@@ -103,8 +103,9 @@ int float_compar(float *first, float *second) {
     // printf("num_boxes is %d\n", nu)
 
     [_results readValues:^(int * _Nonnull results, int min, int max) {
-        for (int i = 0; i < max-min; i++) {
-            int index = (i*num_boxes)/(max-min);
+        int length = (max-min)*8;
+        for (int i = 0; i < length; i++) {
+            int index = (i*num_boxes)/length;
             box_range_values[index] += results[i];
         }
     }];
