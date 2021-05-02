@@ -8,10 +8,8 @@
 
 #import "SimulatorThread.h"
 #import "Results.h"
-#include <libkern/OSAtomic.h>
 
 static const int cache_size = 500;
-static const int checking_time = 400; // from what time it will check contention
 
 @interface SimulatorThread()
 

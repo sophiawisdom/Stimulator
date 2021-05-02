@@ -47,7 +47,14 @@
     // The insight here is that we don't need the most up-to-date or accurate value for _num_results,
     // and we don't need a lock on the underlying array, because it's append-only. Hopefully this should
     // meaningfully reduce contention
-    readBlock(_results, _min, _max, _num_results);
+    __block float *copied_data = NULL;
+    __block long long copied_results = 0;
+    [self acquireLock:^(float * restrict _Nonnull results, int min, int max, long long num_results) {
+        copied_results = num_results;
+        copied_data = malloc(sizeof(float) * num_results);
+        memcpy(copied_data, results, num_results*sizeof(float));
+    }];
+    readBlock(copied_data, _min, _max, copied_results);
 }
 
 - (long long)writeValues: (float *)values count:(int)count {

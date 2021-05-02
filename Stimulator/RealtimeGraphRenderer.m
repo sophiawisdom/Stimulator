@@ -95,20 +95,13 @@ int float_compar(float *first, float *second) {
 
 - (int)num_boxes {
     return _viewportSize.width * graph_width/3;
-    int min = _params -> _min_time;
-    int max = _params -> _max_time;
-    int diff = max-min;
-    
-    int pixel_width = _viewportSize.width * graph_width/3; // at least 3 pixels per bar
-
-    return diff > pixel_width ? pixel_width : diff; // min(diff, pixel_width)
 }
 
 
 - (int *)boxes: (int)num_boxes {
     __block int *box_range_values = calloc(sizeof(int), num_boxes);
     // printf("num_boxes is %d\n", nu)
-    
+
     [_results readValues:^(float * _Nonnull results, int min, int max, long long num_results) {
         for (int i = 0; i < num_results; i++) {
             float result = results[i] - min;

@@ -35,7 +35,8 @@ static const int num_threads = 4;
 - (IBAction)StoplightTimeChanged:(NSSlider *)sender {
     if (sender.floatValue != _params -> _stoplight_time) {
         // printf("Modifying stoplight time, is now %d\n", sender.intValue);
-        self.params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:_params ->_block_width stoplightTime:sender.floatValue streetWidth:_params -> _street_width policy:_params -> _policy];
+        Parameters *new_params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:_params ->_block_width stoplightTime:sender.floatValue streetWidth:_params -> _street_width policy:_params -> _policy];
+        self.params = new_params;
     }
 }
 
@@ -75,8 +76,8 @@ static const int num_threads = 4;
 
 - (void)invalidate {
     _results = [[Results alloc] initWithMin:_params -> _min_time Max:_params -> _max_time];
-    [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj newParams:_params andResults:_results];
+    [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
+        [thread newParams:_params andResults:_results];
     }];
     [_renderer setParams:_params andResults:_results];
 }
