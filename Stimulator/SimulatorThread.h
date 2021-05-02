@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static const int max_results = 100000 * 1000; // max number of simulations we should do before we stop.
+static const int max_results = 400 * 1000; // max number of simulations we should do before we stop.
 
 @interface SimulatorThread : NSObject
 

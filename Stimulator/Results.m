@@ -55,15 +55,14 @@
 
 - (long long)writeValues: (int *)values count:(int)count {
     dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
-    long long sum = 0;
+    int adjusted_min = _min*8;
     for (int i = 0; i < count; i++) {
-        _results[values[i]-(_min*8)] += 1;
-        sum += values[i];
+        _results[values[i]-adjusted_min] += 1;
     }
     
-    _num_results += sum; // hopefully reduce write traffic to _num_results...
+    _num_results += count; // hopefully reduce write traffic to _num_results...
     dispatch_semaphore_signal(_results_lock);
-    return _num_results/8;
+    return _num_results;
 }
 
 - (void)dealloc

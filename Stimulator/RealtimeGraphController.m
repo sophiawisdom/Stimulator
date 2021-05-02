@@ -26,24 +26,23 @@ static const int num_threads = 4;
 // Should we cache previously calculated results? Probably unlikely we would hit the *exact* combination
 
 - (IBAction)HeightChanged:(NSSlider *)sender {
-    if (sender.intValue != _params -> _block_height) {
+    if (sender.intValue != _params -> block_height) {
         // printf("Modifying height, is now %d\n", sender.intValue);
-        self.params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:sender.intValue blockWidth:_params ->_block_width stoplightTime:_params -> _stoplight_time streetWidth:_params -> _street_width policy:_params -> _policy];
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, sender.intValue, _params -> block_width, _params -> stoplight_time, _params -> street_width, _params -> policy);
     }
 }
 
 - (IBAction)StoplightTimeChanged:(NSSlider *)sender {
-    if (sender.floatValue != _params -> _stoplight_time) {
+    if (sender.floatValue != _params -> stoplight_time) {
         // printf("Modifying stoplight time, is now %d\n", sender.intValue);
-        Parameters *new_params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:_params ->_block_width stoplightTime:sender.floatValue streetWidth:_params -> _street_width policy:_params -> _policy];
-        self.params = new_params;
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, sender.floatValue, _params -> street_width, _params -> policy);;
     }
 }
 
 - (IBAction)WidthChanged:(NSSlider *)sender {
-    if (sender.intValue != _params -> _block_width) {
+    if (sender.intValue != _params -> block_width) {
         // printf("Modifying block width, is now %d\n", sender.intValue);
-        self.params = [[Parameters alloc] initWithBlocksWide:_params -> _blocks_wide BlocksHigh:_params -> _blocks_high blockHeight:_params -> _block_height blockWidth:sender.intValue stoplightTime:_params -> _stoplight_time streetWidth:_params -> _street_width policy:_params -> _policy];
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, sender.intValue, _params -> stoplight_time, _params -> street_width, _params -> policy);
     }
 }
 
@@ -66,16 +65,23 @@ static const int num_threads = 4;
     for (int i = 0; i < num_threads; i++) {
         [_threadpool addObject:[[SimulatorThread alloc] init]];
     }
-    self.params = [[Parameters alloc] initWithBlocksWide:30 BlocksHigh:50 blockHeight:10 blockWidth:10 stoplightTime:2 streetWidth:5 policy:default_policy];
+    self.params = create_parameters(50, 50, 10, 10, 4.0, 5, default_policy);
+}
+
+- (void)dealloc
+{
+    free(_params);
 }
 
 - (void)setParams:(Parameters *)params {
+    Parameters *old_params = _params;
     _params = params;
     [self invalidate];
+    free(old_params);
 }
 
 - (void)invalidate {
-    _results = [[Results alloc] initWithMin:_params -> _min_time Max:_params -> _max_time MaxWriters:num_threads];
+    _results = [[Results alloc] initWithMin:_params -> min_time Max:_params -> max_time MaxWriters:num_threads];
     [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
         [thread newParams:_params andResults:_results];
     }];

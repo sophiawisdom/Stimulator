@@ -12,22 +12,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// "Parameters" is a *very* simple wrapper over a set of numbers.
-@interface Parameters : NSObject {
-    @public int _blocks_wide;
-    @public int _blocks_high;
-    @public float _block_height;
-    @public float _block_width;
-    @public float _stoplight_time;
-    @public float _street_width;
-    @public PolicyFunc _policy;
+typedef struct Parameters {
+    int blocks_wide;
+    int blocks_high;
+    float block_height;
+    float block_width;
+    float stoplight_time;
+    float street_width;
+    PolicyFunc policy;
 
-    @public int _min_time;
-    @public int _max_time;
-};
+    int max_time;
+    int min_time;
+} Parameters;
 
-- (instancetype)initWithBlocksWide:(int)blocksWide BlocksHigh:(int)blocksHigh blockHeight:(float)blockHeight blockWidth:(float)blockWidth stoplightTime:(float)stoplightTime streetWidth:(float)streetWidth policy: (PolicyFunc)policy;
-
-@end
+NSString *parameters_description(Parameters *params);
+Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
 
 NS_ASSUME_NONNULL_END

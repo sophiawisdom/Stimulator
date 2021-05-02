@@ -32,7 +32,9 @@ int float_compar(float *first, float *second) {
     CGSize _viewportSize;
     Results *_results;
     Parameters *_params;
+
     SKRenderer *_renderer;
+    SKLabelNode *_textNode;
 }
 
 - (instancetype)initWithMTKView:(MTKView *)view {
@@ -77,13 +79,13 @@ int float_compar(float *first, float *second) {
         
         _renderer = [SKRenderer rendererWithDevice:_device];
         _renderer.scene = [[SKScene alloc] initWithSize:_viewportSize];
-        /*
-        SKLabelNode *node = [SKLabelNode labelNodeWithText:@"Hey! This is a really long piece of text!"];
-        node.color = [NSColor blackColor];
-        node.fontSize = 100;
-        node.fontName = @"Arial";
-        [_renderer.scene addChild:node];
-         */
+
+        _textNode = [SKLabelNode labelNodeWithText:@"Hey!"];
+        _textNode.fontColor = [NSColor blackColor];
+        _textNode.fontSize = 20;
+        _textNode.fontName = @"Arial";
+
+        [_renderer.scene addChild:_textNode];
     }
     return self;
 }
@@ -109,6 +111,12 @@ int float_compar(float *first, float *second) {
             box_range_values[index] += results[i];
         }
     }];
+    
+    /*
+    for (int i = 0; i < num_boxes; i++) {
+        box_range_values[i] = 1;
+    }
+     */
     
     /*
     printf("Boxes: ");
@@ -143,6 +151,10 @@ int float_compar(float *first, float *second) {
         box_max = box_max > box_values[i] ? box_max : box_values[i];
     }
     // printf("box_max is %d\n", box_max);
+    
+    CGPoint mouseLocation = [NSEvent mouseLocation];
+    _textNode.position = CGPointMake(mouseLocation.x*2-300, mouseLocation.y*2-350);
+    _textNode.text = [NSString stringWithFormat:@"(%g, %g)", _textNode.position.x, _textNode.position.y];
 
     // Draw first triangles
     [commandEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.width, _viewportSize.height, 0.0, 1.0 }];
