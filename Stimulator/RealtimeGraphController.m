@@ -35,8 +35,25 @@ static const int num_threads = 4;
 - (IBAction)StoplightTimeChanged:(NSSlider *)sender {
     if (sender.floatValue != _params -> stoplight_time) {
         // printf("Modifying stoplight time, is now %d\n", sender.intValue);
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, sender.floatValue, _params -> street_width, _params -> policy);;
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, sender.floatValue, _params -> street_width, _params -> policy);
     }
+}
+- (IBAction)DefaultPolicySet:(NSButton *)sender {
+    [self change_policy:default_policy];
+}
+- (IBAction)BetterPolicySet:(NSButton *)sender {
+    [self change_policy:avoid_waiting_policy];
+}
+- (IBAction)BestPolicySet:(NSButton *)sender {
+    [self change_policy:faster_policy];
+}
+
+
+- (void)change_policy:(PolicyFunc)new_policy {
+    if (new_policy != _params -> policy) {
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, new_policy);
+    }
+    // TODO: CHANGE LABEL SO USER KNOWS WHICH ONE IS DEFAULT AND WHICH ONE IS BETTER
 }
 
 - (IBAction)WidthChanged:(NSSlider *)sender {

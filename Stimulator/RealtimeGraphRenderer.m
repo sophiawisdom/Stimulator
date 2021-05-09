@@ -12,16 +12,6 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-// Used for qsort()
-int float_compar(float *first, float *second) {
-    if (first < second) {
-        return -1;
-    } else if (second > first) {
-        return 1;
-    }
-    return 0;
-}
-
 @implementation RealtimeGraphRenderer {
     id<MTLDevice> _device;
     id<MTLCommandQueue> _commandQueue;
@@ -29,12 +19,16 @@ int float_compar(float *first, float *second) {
     // The render pipeline generated from the vertex and fragment shaders in the .metal shader file.
     id<MTLRenderPipelineState> _firstTrianglePipeline;
     id<MTLRenderPipelineState> _secondTrianglePipeline;
+    id<MTLRenderPipelineState> _meanLinePipeline;
     CGSize _viewportSize;
     Results *_results;
     Parameters *_params;
 
     SKRenderer *_renderer;
     SKLabelNode *_textNode;
+    SKLabelNode *_min_node;
+    SKLabelNode *_max_node;
+    __weak IBOutlet NSTextField *mean_field;
 }
 
 - (instancetype)initWithMTKView:(MTKView *)view {
@@ -46,6 +40,7 @@ int float_compar(float *first, float *second) {
 
         id<MTLFunction> firstTriangleFunction = [defaultLibrary newFunctionWithName:@"firstTriangle"];
         id<MTLFunction> secondTriangleFunction = [defaultLibrary newFunctionWithName:@"secondTriangle"];
+        id<MTLFunction> meanLineFunction = [defaultLibrary newFunctionWithName:@"meanLine"];
         id<MTLFunction> fragmentFunction = [defaultLibrary newFunctionWithName:@"fragmentShader"];
         
         // Configure a pipeline descriptor that is used to create a pipeline state.
@@ -73,6 +68,17 @@ int float_compar(float *first, float *second) {
         if (secondError != nil) {
             NSLog(@"Encountered error with setting up second pipeline: %@", secondError);
         }
+        
+        MTLRenderPipelineDescriptor *meanLineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
+        meanLineStateDescriptor.label = @"Mean line Pipeline";
+        meanLineStateDescriptor.vertexFunction = meanLineFunction;
+        meanLineStateDescriptor.fragmentFunction = fragmentFunction;
+        meanLineStateDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat;
+        NSError *thirdError;
+        _meanLinePipeline = [_device newRenderPipelineStateWithDescriptor:meanLineStateDescriptor error:&thirdError];
+        if (thirdError != nil) {
+            NSLog(@"Encountered error with setting up mean line pipeline: %@", secondError);
+        }
 
         // Create the command queue
         _commandQueue = [_device newCommandQueue];
@@ -84,6 +90,20 @@ int float_compar(float *first, float *second) {
         _textNode.fontColor = [NSColor blackColor];
         _textNode.fontSize = 20;
         _textNode.fontName = @"Arial";
+        _textNode.hidden = true;
+        
+        _min_node = [SKLabelNode labelNodeWithFontNamed:@"Arial"];
+        _min_node.position = CGPointMake(100, 20);
+
+        _max_node = [SKLabelNode labelNodeWithFontNamed:@"Arial"];
+        _max_node.position = CGPointMake(800, 20);
+        
+        [@[_min_node, _max_node] enumerateObjectsUsingBlock:^(SKLabelNode *  _Nonnull node, NSUInteger idx, BOOL * _Nonnull stop) {
+            node.fontColor = [NSColor blackColor];
+            node.fontSize = 20;
+            node.hidden = false;
+            [_renderer.scene addChild:node];
+        }];
 
         [_renderer.scene addChild:_textNode];
     }
@@ -97,6 +117,20 @@ int float_compar(float *first, float *second) {
 
 - (int)num_boxes {
     return _viewportSize.width * graph_width/3;
+}
+
+- (float)mean {
+    // Not ideal to be doing two readValues calls. We could put this in box and have that update it.
+    __block double total = 0;
+    __block double count = 0;
+    [_results readValues:^(int * _Nonnull results, int min, int max) {
+        double diff = (max-min)*8;
+        for (int i = 0; i < diff; i++) {
+            total += (i * results[i])/diff; // Ultimately we want a value between 0 and 1 for use in the UI.
+            count += results[i];
+        }
+    }];
+    return total/count;
 }
 
 
@@ -150,11 +184,18 @@ int float_compar(float *first, float *second) {
     for (int i = 0; i < num_boxes; i++) {
         box_max = box_max > box_values[i] ? box_max : box_values[i];
     }
+    float mean = self.mean;
     // printf("box_max is %d\n", box_max);
     
     CGPoint mouseLocation = [NSEvent mouseLocation];
     _textNode.position = CGPointMake(mouseLocation.x*2-300, mouseLocation.y*2-350);
     _textNode.text = [NSString stringWithFormat:@"(%g, %g)", _textNode.position.x, _textNode.position.y];
+    _textNode.hidden = false;
+    
+    _max_node.text = [NSString stringWithFormat:@"%d", _params -> max_time];
+    _min_node.text = [NSString stringWithFormat:@"%d", _params -> min_time];
+    // _max_node.position = CGPointMake(mouseLocation.x*2-350, mouseLocation.y*2-300);
+    // _min_node.position = CGPointMake(mouseLocation.x*2-250, mouseLocation.y*2-300);
 
     // Draw first triangles
     [commandEncoder setViewport:(MTLViewport){0.0, 0.0, _viewportSize.width, _viewportSize.height, 0.0, 1.0 }];
@@ -175,6 +216,12 @@ int float_compar(float *first, float *second) {
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
+    
+    [commandEncoder setRenderPipelineState:_meanLinePipeline];
+    [commandEncoder setVertexBytes:&mean
+                           length:sizeof(float)
+                          atIndex:MeanLineInputIndexMean];
+    [commandEncoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:2];
     
     [_renderer renderWithViewport:CGRectMake(0, 0, _viewportSize.width, _viewportSize.height) renderCommandEncoder:commandEncoder renderPassDescriptor:renderPassDescriptor commandQueue:_commandQueue];
 

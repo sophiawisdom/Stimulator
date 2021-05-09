@@ -26,9 +26,11 @@ static const int cache_size = 500;
     int _cache_used;
     dispatch_semaphore_t _sem;
     
+    /*
     long _last_flush;
     long _total_flush_time;
     long _num_flushes;
+     */
 }
 
 static volatile int thread_num = 0;
@@ -46,9 +48,11 @@ static volatile int thread_num = 0;
         _thread.stackSize = 0x19000; // small stack, we should only be going one or two layers deep of recursion.
         NSLog(@"Created thread, %@", _thread);
         
+        /*
         _last_flush = -1;
         _total_flush_time = 0;
         _num_flushes = 0;
+         */
     }
     return self;
 }
@@ -67,12 +71,11 @@ static volatile int thread_num = 0;
 }
 
 - (void)pause {
-    self.dirty = true;
-    dispatch_semaphore_wait(_sem, DISPATCH_TIME_FOREVER);
+    thread_suspend(_thread_port);
 }
 
 - (void)unpause {
-    dispatch_semaphore_signal(_sem);
+    thread_resume(_thread_port);
 }
 
 - (void)dealloc
@@ -84,21 +87,23 @@ static volatile int thread_num = 0;
 - (void)flush_cache {
     long long total_written = [_results writeValues:self->_results_cache count:_cache_used];
     _cache_used = 0;
+    /*
     long done_time = clock();
     if (_last_flush != -1) {
         _total_flush_time += done_time - _last_flush;
         _num_flushes++;
     }
     _last_flush = done_time;
+     */
     if (total_written == -1 || total_written > max_results) {
         // If we've already written enough, put the thread in hibernation until the parameters change.
         // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
         // but I thought this would be lower-latency, and more accurately describes the intended semantics
         // ("sleep until something's changed").
-        printf("SUSPENDING THREAD %s. Did %ld flushes in %ld total time, average %g\n", _thread.name.UTF8String, _num_flushes, _total_flush_time, ( (double)_total_flush_time)/((double)_num_flushes));
+        // printf("SUSPENDING THREAD %s. Did %ld flushes in %ld total time, average %g\n", _thread.name.UTF8String, _num_flushes, _total_flush_time, ( (double)_total_flush_time)/((double)_num_flushes));
         thread_suspend(_thread_port);
-        printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
-        _last_flush = clock();
+        // printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
+        // _last_flush = clock();
     }
 }
 
@@ -106,8 +111,6 @@ static volatile int thread_num = 0;
     _thread_port = mach_thread_self();
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time
-            dispatch_semaphore_wait(_sem, DISPATCH_TIME_FOREVER);
-            dispatch_semaphore_signal(_sem);
             memset(_results_cache, 0, cache_size);
             _cache_used = 0;
             self.dirty = false;

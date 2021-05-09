@@ -10,6 +10,7 @@ struct RasterizerData
     // is the clip space position of the vertex when this structure is
     // returned from the vertex function.
     float4 position [[position]];
+    bool MeanLine; // If it's for the mean line. This is dumb because it carries runtime cost for what should be a compile-time distinction. But overall it's fine, should reduce complexity slightly.
 };
 
 // Bottom triangle
@@ -33,6 +34,7 @@ firstTriangle(uint vertexID [[vertex_id]],
         x += (graph_width*2)/num_boxes;
     }
     out.position = vector_float4(x, y, 0.0, 1.0);
+    out.MeanLine = false;
     return out;
 }
 
@@ -57,11 +59,33 @@ secondTriangle(uint vertexID [[vertex_id]],
         y = -graph_width;
     }
     out.position = vector_float4(x, y, 0.0, 1.0);
+    out.MeanLine = false;
+    return out;
+}
+
+vertex RasterizerData
+meanLine(uint vertexID [[vertex_id]],constant float *meanPointer [[buffer(MeanLineInputIndexMean)]])
+{
+    RasterizerData out;
+    
+    float mean = float(*meanPointer); // value between 0 and 1.
+    float x = (mean*1.8)-0.9f;
+    if (!(vertexID & 1)) { // first point
+        out.position = vector_float4(x, -.9, 0.0, 1.0);
+    } else { // second point
+        out.position = vector_float4(x, .9, 0.0, 1.0);
+    }
+    
+    out.MeanLine = true;
     return out;
 }
 
 fragment float4 fragmentShader(RasterizerData in [[stage_in]])
 {
     // Return the interpolated color.
-    return float4(0.0, 0.0, 1.0, 1.0);
+    if (in.MeanLine) {
+        return float4(1.0, 0.0, 0.0, 1.0);
+    } else {
+        return float4(0.0, 0.0, 1.0, 1.0);
+    }
 }

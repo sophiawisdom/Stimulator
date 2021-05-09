@@ -18,7 +18,7 @@ double get_stoplight_time(struct simul *simulation, int x, int y) {
     return simulation -> times[index];
 }
 
-int stoplight_wait(struct simul *simulation, PolicyResult direction) {
+double stoplight_wait(struct simul *simulation, PolicyResult direction) {
     int effective_x = simulation -> current_x - !simulation->x_right + 1;
     int effective_y = simulation -> current_y - !simulation->y_top + 1;
 #ifdef DEBUG
@@ -59,7 +59,7 @@ bool step_simul(struct simul *simulation) {
         printf("Handling right response\n");
 #endif
         if (simulation -> x_right) { // we're at the right, so if we go right now we're crossing the street
-            int wait_time = stoplight_wait(simulation, response);
+            double wait_time = stoplight_wait(simulation, response);
             simulation -> diag.time_waiting += wait_time;
             simulation -> cur_t += simulation->street_width + wait_time;
             simulation -> x_right = false;
@@ -73,7 +73,7 @@ bool step_simul(struct simul *simulation) {
         printf("Handling top response\n");
 #endif
         if (simulation -> y_top) { // we're at the top, so we're crossing the street here
-            int wait_time = stoplight_wait(simulation, response);
+            double wait_time = stoplight_wait(simulation, response);
             simulation -> diag.time_waiting += wait_time;
             simulation -> cur_t += simulation->street_width + wait_time;
             simulation -> y_top = false;
@@ -119,6 +119,53 @@ PolicyResult avoid_waiting_policy(struct simul *simulation) {
     }
 
     if (stoplight_wait(simulation, Top) == 0) {
+        return Top;
+    } else {
+        return Right;
+    }
+}
+
+// If we're off course, off the ideal diagonal, start sacrificing a little waiting time to get closer to the diagonal.
+PolicyResult faster_policy(struct simul *simulation) {
+    // If we've hit the edges, we have no more options, just continue towards the destination.
+    if (simulation -> current_y+1 == simulation -> blocks_high && simulation -> y_top) {
+        return Right;
+    }
+    else if (simulation -> current_x+1 == simulation -> blocks_wide && simulation -> x_right) {
+        return Top;
+    }
+    
+    // how "steep" is the way we're trying to go?
+    double grade = ((double) simulation -> blocks_wide) / ((double) simulation -> blocks_high);
+    double diagonal_current_y = grade * simulation -> current_x;
+    double blocks_off_diagonal = diagonal_current_y - simulation -> current_y;
+    // if this is positive, it means we're below where we need to be -- we should prioritize Top. If it's negative, we should prioritize
+    // Right.
+
+    double top_stoplight_time = stoplight_wait(simulation, Top);
+    
+    if (blocks_off_diagonal > 5) { // Want to go top if feasible
+        // 20 blocks off, tolerate up to 4s. 10 blocks off, tolerate up to 2s, etc.
+        if (top_stoplight_time < blocks_off_diagonal/5) {
+            return Top;
+        }
+        return Right;
+    }
+    if (blocks_off_diagonal < -5) { // Want to go right if feasible
+        if (top_stoplight_time > 0) { // if top_stoplight_time > 0, right_stoplight_time == 0, so we can just go. This is a perf optimization.
+            return Right;
+        }
+
+        double right_stoplight_time = stoplight_wait(simulation, Right);
+        // 20 blocks off, tolerate up to 4s. 10 blocks off, tolerate up to 2s, etc.
+        if (right_stoplight_time < fabs(blocks_off_diagonal)/5) {
+            return Right;
+        }
+        return Top;
+    }
+
+    // We're on track, so just go whichever way can be gone immediately.
+    if (top_stoplight_time == 0) {
         return Top;
     } else {
         return Right;

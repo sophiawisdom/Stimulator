@@ -17,6 +17,10 @@ typedef enum GraphRendererInputIndex {
     GraphRendererInputIndexBoxTotal = 2
 } GraphRendererInputIndex;
 
+typedef enum MeanLineInputIndex {
+    MeanLineInputIndexMean = 0,
+} MeanLineInputIndex;
+
 // Sharing constants is difficult because they can change -- easier to share an include.
 #define graph_width (0.9)
 

@@ -47,3 +47,4 @@ struct diagnostics simulate(int blocks_wide, int blocks_high, float block_height
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
 PolicyResult default_policy(struct simul *simulation);
+PolicyResult faster_policy(struct simul *simulation);
