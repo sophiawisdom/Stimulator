@@ -7,10 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "../libclang/Index.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Diagnostic : NSObject
+
+@property NSString *str;
+@property unsigned int line;
+@property unsigned int column;
+@property enum CXDiagnosticSeverity severity;
 
 @end
 

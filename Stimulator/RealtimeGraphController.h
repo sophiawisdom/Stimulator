@@ -7,11 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "Parameters.h"
+#import "Simul.h"
+#import "PolicyCompiler.h"
 
-@interface RealtimeGraphController : NSViewController
-
-@property (nonatomic) Parameters *params;
+@interface RealtimeGraphController : NSViewController<PolicyObserver>
 
 @end
 

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <MetalKit/MetalKit.h>
 
-#import "Parameters.h"
+#import "Simul.h"
 #import "Results.h"
 
 NS_ASSUME_NONNULL_BEGIN

@@ -70,18 +70,10 @@ static volatile int thread_num = 0;
     }
 }
 
-- (void)pause {
-    thread_suspend(_thread_port);
-}
-
-- (void)unpause {
-    thread_resume(_thread_port);
-}
-
 - (void)dealloc
 {
     free(_results_cache);
-    mach_port_destroy(mach_task_self(), _thread_port);
+    mach_port_deallocate(mach_task_self(), _thread_port); // mach_thread_self() allocates a port, unlike mach_task_self()
 }
 
 - (void)flush_cache {
@@ -116,8 +108,8 @@ static volatile int thread_num = 0;
             self.dirty = false;
         }
 
-        struct diagnostics result = simulate(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, _params -> policy);
-        
+        struct diagnostics result = simulate(_params);
+
         _results_cache[_cache_used++] = result.total_time * 8;
         if (_cache_used == cache_size) {
             [self flush_cache];

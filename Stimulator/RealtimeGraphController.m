@@ -13,6 +13,7 @@
 #include "Simul.h"
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
+#import "PolicyCompiler.h"
 
 static const int num_threads = 4;
 
@@ -21,9 +22,12 @@ static const int num_threads = 4;
     Results *_results;
     MTKView *_view;
     RealtimeGraphRenderer *_renderer;
+    PolicyCompiler *_policycompiler;
+    Parameters *_params;
+    PolicyFunc _compiled_policy;
 }
 
-// Should we cache previously calculated results? Probably unlikely we would hit the *exact* combination
+// MARK: handle button presses
 
 - (IBAction)HeightChanged:(NSSlider *)sender {
     if (sender.intValue != _params -> block_height) {
@@ -48,7 +52,6 @@ static const int num_threads = 4;
     [self change_policy:faster_policy];
 }
 
-
 - (void)change_policy:(PolicyFunc)new_policy {
     if (new_policy != _params -> policy) {
         self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, new_policy);
@@ -65,19 +68,16 @@ static const int num_threads = 4;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSLog(@"self.view is %@\n", self.view);
-    
     srandomdev();
-    
+
     _view = (MTKView *)self.view;
-        
     _view.device = MTLCreateSystemDefaultDevice();
-    
     _view.clearColor = MTLClearColorMake(1.0, 1.0, 1.0, 1.0); // white
-    
     _renderer = [[RealtimeGraphRenderer alloc] initWithMTKView:_view];
     _view.delegate = _renderer;
     
+    _policycompiler = [[PolicyCompiler alloc] initWithObject:self];
+
     _threadpool = [[NSMutableArray alloc] initWithCapacity:num_threads];
     for (int i = 0; i < num_threads; i++) {
         [_threadpool addObject:[[SimulatorThread alloc] init]];
@@ -112,5 +112,9 @@ static const int num_threads = 4;
     // Update the view, if already loaded.
 }
 
+
+- (void)setCompiledPolicy:(nonnull PolicyFunc)policy {
+    _compiled_policy = policy;
+}
 
 @end

@@ -7,7 +7,7 @@
 //
 
 #import "PolicyCompiler.h"
-#include "Index.h"
+#include "../libclang/Index.h"
 
 @implementation PolicyCompiler {
     id<PolicyObserver> _obj;
@@ -53,44 +53,74 @@
     }
 }
 
-- (NSArray<Diagnostics>)setCode:(NSString *)code {
-    if ([code isEqualToString:_code]) {
-        return;
-    }
+- (NSArray<Diagnostic *> *)setCode:(NSString *)code {
     // ANALYZE
     struct CXUnsavedFile *file = calloc(1, sizeof(struct CXUnsavedFile));
     file -> Contents = [_code UTF8String];
     file -> Length = strlen(file -> Contents);
     file -> Filename = [_tempfile UTF8String];
-    
+
     // TODO: clang_reparse? Could give perf improvement.
     // Also: precompiled headers?
+    if (_cur_tu) {
+        clang_disposeTranslationUnit(_cur_tu);
+    }
+
     const char *args[] = {
         "-I."
     };
     int resp = clang_parseTranslationUnit2(_index, NULL, args, sizeof(args)/sizeof(*args), file, 1, CXTranslationUnit_None, &_cur_tu);
     if (resp != 0) {
         printf("clang ParseTranslationUnit2 failed, error code %d\n", resp);
-        return;
+        return NULL;
     }
+    
+    bool compilable = true;
 
     int diagnosticCount = clang_getNumDiagnostics(_cur_tu);
-    NSMutableArray<NSString *> *diagnostics = [[NSMutableArray alloc] initWithCapacity:diagnosticCount];
+    NSMutableArray<Diagnostic *> *diagnostics = [[NSMutableArray alloc] initWithCapacity:diagnosticCount];
     for (unsigned int i = 0; i < diagnosticCount; i++) {
         CXDiagnostic diagnostic = clang_getDiagnostic(_cur_tu, i);
-        clang_getDiagnosticSeverity(diagnostic);
+        Diagnostic *diagnostic_obj = [[Diagnostic alloc] init];
+
+        diagnostic_obj.severity = clang_getDiagnosticSeverity(diagnostic);
+        if (clang_getDiagnosticSeverity(diagnostic) == CXDiagnostic_Error || clang_getDiagnosticSeverity(diagnostic) == CXDiagnostic_Fatal) {
+            compilable = false;
+        }
+        CXString text = clang_getDiagnosticSpelling(diagnostic); // consider clang_formatDiagnostic
+        diagnostic_obj.str = [NSString stringWithUTF8String:clang_getCString(text)];
+        clang_disposeString(text);
+
         CXSourceLocation loc = clang_getDiagnosticLocation(diagnostic);
-        [diagnostics addObject:<#(nonnull NSString *)#>]
+        unsigned int line = 0;
+        unsigned int column = 0;
+        clang_getSpellingLocation(loc, NULL, &line, &column, NULL);
+        diagnostic_obj.line = line;
+        diagnostic_obj.column = column;
         
+        [diagnostics addObject:diagnostic_obj];
+        clang_disposeDiagnostic(diagnostic); // TODO: Is this necessary?
     }
+    
+    clang_visitChildrenWithBlock(clang_getTranslationUnitCursor(_cur_tu), ^enum CXChildVisitResult(CXCursor cursor, CXCursor parent) {
+        // Don't allow any additional function declarations.
+        // Don't allow any return statements that don't return one of Right or Top
+        return CXChildVisit_Recurse;
+    });
 
     _code = code;
     thread_resume(_thread_port);
+
+    return diagnostics;
 }
 
 - (void)dealloc
 {
     mach_port_deallocate(mach_task_self(), _thread_port);
+    if (_cur_tu) {
+        clang_disposeTranslationUnit(_cur_tu);
+    }
+    clang_disposeIndex(_index);
 }
 
 @end

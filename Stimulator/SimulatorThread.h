@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Results.h"
-#import "Parameters.h"
+#import "Simul.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

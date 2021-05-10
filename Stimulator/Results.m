@@ -11,9 +11,9 @@
 
 @implementation Results {
     _Atomic int *_results; // length of blocks_wide*block_width + blocks_high*block_height + (stoplight_time + street_wide)*(blocks_high+blocks_wide), which should be maximum time
+    _Atomic long long _num_results;
     int _min;
     int _max;
-    _Atomic long long _num_results;
     int _max_writers;
     dispatch_semaphore_t _results_lock;
 }
@@ -38,10 +38,8 @@
     return _max-_min;
 }
 
-- (void)readValues:(void (^)(int * _Nonnull, int, int))readBlock {
-    // The insight here is that we don't need the most up-to-date or accurate value for _num_results,
-    // and we don't need a lock on the underlying array, because it's append-only. Hopefully this should
-    // meaningfully reduce contention
+- (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {
+    // The wait and signal in writeValues *should* be fast and mostly userside
     for (int i = 0; i < _max_writers; i++) {
         dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
     }
@@ -54,7 +52,13 @@
 }
 
 - (long long)writeValues: (int *)values count:(int)count {
-    dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
+    // The key insight here is that if we make the underlying array _Atomic, we can have as many writers
+    // as we want, because every increment will be atomic. Mostly we won't even have too much contention,
+    // because the writes will be spread out among a bunch of different values.
+    // In practice, this is a ~100x reduction in time spent in this function vs one writer.
+
+    dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER); // If this hits the kernel every time,
+    // that would suck. Right now it isn't a big problem, but ideally we could do this userside.
     int adjusted_min = _min*8;
     for (int i = 0; i < count; i++) {
         _results[values[i]-adjusted_min] += 1;
@@ -67,7 +71,7 @@
 
 - (void)dealloc
 {
-    // could we somehow free all the waiters here?
+    // could we somehow free all the waiters here? Perhaps destroy the semaphore? idk...
     free(_results);
 }
 

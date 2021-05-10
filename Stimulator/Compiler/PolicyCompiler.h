@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Simul.h"
+#import "Diagnostic.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Callback for when policy has changed. Passed one argument, a function.
 - (instancetype)initWithObject:(id<PolicyObserver>)obj;
 
-- (void)setCode:(NSString *)code;
+- (nullable NSArray<Diagnostic *> *)setCode:(NSString *)code;
 
 @end
 

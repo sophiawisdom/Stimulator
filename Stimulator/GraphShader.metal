@@ -67,7 +67,6 @@ vertex RasterizerData
 meanLine(uint vertexID [[vertex_id]],constant float *meanPointer [[buffer(MeanLineInputIndexMean)]])
 {
     RasterizerData out;
-    
     float mean = float(*meanPointer); // value between 0 and 1.
     float x = (mean*1.8)-0.9f;
     if (!(vertexID & 1)) { // first point
@@ -84,8 +83,8 @@ fragment float4 fragmentShader(RasterizerData in [[stage_in]])
 {
     // Return the interpolated color.
     if (in.MeanLine) {
-        return float4(1.0, 0.0, 0.0, 1.0);
+        return float4(1.0, 0.0, 0.0, 1.0); // red
     } else {
-        return float4(0.0, 0.0, 1.0, 1.0);
+        return float4(0.0, 0.0, 1.0, 1.0); // blue
     }
 }

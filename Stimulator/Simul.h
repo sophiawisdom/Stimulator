@@ -7,6 +7,21 @@ struct simul;
 
 typedef PolicyResult (*PolicyFunc)(struct simul * test);
 
+typedef struct Parameters {
+    int blocks_wide;
+    int blocks_high;
+    float block_height;
+    float block_width;
+    float stoplight_time;
+    float street_width;
+    PolicyFunc policy;
+
+    int max_time;
+    int min_time;
+} Parameters;
+
+Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
+
 struct diagnostics {
     int time_waiting;
     double total_time;
@@ -17,13 +32,7 @@ struct diagnostics {
 
 struct simul {
     struct diagnostics diag;
-
-    float block_height;
-    float block_width;
-    int blocks_high;
-    int blocks_wide;
-    float street_width;
-
+    Parameters params;
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
     
     // TODO: remove this if we aren't going to make policies that use it. It's kind of like
@@ -37,13 +46,9 @@ struct simul {
     bool y_top; // true: we're at the top of the block. false: we're at the bottom of the block
 
     float cur_t;
-
-    float stoplight_time;
-
-    PolicyFunc policy;
 };
 
-struct diagnostics simulate(int blocks_wide, int blocks_high, float block_height, float block_width, float stoplight_time, float street_width, PolicyFunc policy);
+struct diagnostics simulate(Parameters *params);
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
 PolicyResult default_policy(struct simul *simulation);

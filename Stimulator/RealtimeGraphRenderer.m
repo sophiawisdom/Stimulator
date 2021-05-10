@@ -123,7 +123,7 @@
     // Not ideal to be doing two readValues calls. We could put this in box and have that update it.
     __block double total = 0;
     __block double count = 0;
-    [_results readValues:^(int * _Nonnull results, int min, int max) {
+    [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
         double diff = (max-min)*8;
         for (int i = 0; i < diff; i++) {
             total += (i * results[i])/diff; // Ultimately we want a value between 0 and 1 for use in the UI.
@@ -138,7 +138,7 @@
     __block int *box_range_values = calloc(sizeof(int), num_boxes);
     // printf("num_boxes is %d\n", nu)
 
-    [_results readValues:^(int * _Nonnull results, int min, int max) {
+    [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
         int length = (max-min)*8;
         for (int i = 0; i < length; i++) {
             int index = (i*num_boxes)/length;
