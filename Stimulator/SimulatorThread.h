@@ -20,6 +20,9 @@ static const int max_results = 400 * 1000; // max number of simulations we shoul
 
 - (void)newParams:(Parameters *)params andResults: (Results *)results;
 
+- (void)pause;
+- (void)unpause;
+
 @end
 
 NS_ASSUME_NONNULL_END

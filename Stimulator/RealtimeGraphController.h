@@ -9,8 +9,11 @@
 #import <Cocoa/Cocoa.h>
 #import "Simul.h"
 #import "PolicyCompiler.h"
+#import "PolicyChooserView.h"
 
-@interface RealtimeGraphController : NSViewController<PolicyObserver>
+@interface RealtimeGraphController : NSViewController<PolicyObserver, PolicyReceiver>
+
+- (instancetype)initWithFrame:(NSRect)frame;
 
 @end
 

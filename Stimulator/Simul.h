@@ -51,5 +51,20 @@ struct simul {
 struct diagnostics simulate(Parameters *params);
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
+PolicyResult avoid_waiting_policy_2(struct simul *simulation);
 PolicyResult default_policy(struct simul *simulation);
 PolicyResult faster_policy(struct simul *simulation);
+PolicyResult faster_policy_2(struct simul *simulation);
+
+typedef struct PolicyFunction {
+    PolicyFunc policy;
+    char *name; // used for UI
+} PolicyFunction;
+
+static const PolicyFunction policies[5] = {
+    {.policy = faster_policy_2, .name="new faster policy"},
+    {.policy = faster_policy, .name="faster policy"},
+    {.policy = avoid_waiting_policy_2, .name="new avoid waiting policy"},
+    {.policy = avoid_waiting_policy, .name="avoid waiting policy"},
+    {.policy = default_policy, .name="default policy"}
+};

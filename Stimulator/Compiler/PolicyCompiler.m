@@ -46,9 +46,10 @@
             thread_suspend(_thread_port);
         }
         last_code = _code;
-        
+
         // Now we compile last_code to a policy function
-        
+
+
         [_obj setCompiledPolicy:default_policy];
     }
 }
@@ -102,14 +103,29 @@
         clang_disposeDiagnostic(diagnostic); // TODO: Is this necessary?
     }
     
+    __block bool legit = true;
     clang_visitChildrenWithBlock(clang_getTranslationUnitCursor(_cur_tu), ^enum CXChildVisitResult(CXCursor cursor, CXCursor parent) {
         // Don't allow any additional function declarations.
         // Don't allow any return statements that don't return one of Right or Top
+        // Don't allow any writes to memory, including to the struct simul
+        // Don't allow any function calls other than the ones we expose
+        // Function should as a whole be "pure"
+        if (0) {
+            legit = false;
+            Diagnostic *diagnostic_obj = [[Diagnostic alloc] init];
+            diagnostic_obj.column = 5;
+            diagnostic_obj.line = 5;
+            diagnostic_obj.severity = CXDiagnostic_Error;
+            diagnostic_obj.str = @"Return statement not one of Right or Top.";
+            [diagnostics addObject:diagnostic_obj];
+        }
         return CXChildVisit_Recurse;
     });
-
-    _code = code;
-    thread_resume(_thread_port);
+    
+    if (compilable && legit)  {
+        _code = code;
+        thread_resume(_thread_port); // begin compiling the code into a policy
+    }
 
     return diagnostics;
 }

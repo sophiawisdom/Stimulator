@@ -70,6 +70,21 @@ static volatile int thread_num = 0;
     }
 }
 
+
+// TODO: FIX THIS. this is almost certainly subtly wrong.
+// One source of wrongness would be if we expected resumes and suspends to be balanced but 2 resumes
+// happened before a suspend, which would effectively waste a resume.
+// Another would be that [ newParams] overrides [ pause], which is sort of weird. Just generally,
+// pause and unpause *should* be their own mechanism, which doesn't have potentially weird interactions
+// with everything else.
+- (void)pause {
+    thread_suspend(_thread_port);
+}
+
+- (void)unpause {
+    thread_resume(_thread_port);
+}
+
 - (void)dealloc
 {
     free(_results_cache);

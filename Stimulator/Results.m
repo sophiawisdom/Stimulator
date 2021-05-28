@@ -39,7 +39,7 @@
 }
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {
-    // The wait and signal in writeValues *should* be fast and mostly userside
+    // We acquire all the values on the semaphore to ensure there are no writers
     for (int i = 0; i < _max_writers; i++) {
         dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
     }
@@ -64,7 +64,7 @@
         _results[values[i]-adjusted_min] += 1;
     }
     
-    _num_results += count; // hopefully reduce write traffic to _num_results...
+    _num_results += count;
     dispatch_semaphore_signal(_results_lock);
     return _num_results;
 }

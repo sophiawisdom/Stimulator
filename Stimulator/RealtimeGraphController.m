@@ -14,21 +14,72 @@
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
 #import "PolicyCompiler.h"
+#import "PolicyChooserView.h"
 
-static const int num_threads = 4;
+static const unsigned int num_threads = 1;
 
 @implementation RealtimeGraphController {
+    NSRect _frame;
     NSMutableArray<SimulatorThread *> *_threadpool;
     Results *_results;
     MTKView *_view;
-    RealtimeGraphRenderer *_renderer;
+    RealtimeGraphRenderer *_distribution_renderer;
     PolicyCompiler *_policycompiler;
     Parameters *_params;
     PolicyFunc _compiled_policy;
 }
 
-// MARK: handle button presses
+- (instancetype)initWithFrame:(NSRect)frame
+{
+    if (self = [super init]) {
+        _frame = frame;
+    }
+    return self;
+}
 
+- (void)loadView {
+    NSLog(@"RealtimeGraphController's loadView was called... parent frame is %@\n", NSStringFromRect(_frame));
+    /*
+    self.view = [[NSView alloc] initWithFrame:_frame];
+    NSButton *button = [[NSButton alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
+    [self.view addSubview:button];
+     */
+    self.view = [[MTKView alloc] initWithFrame:_frame device:MTLCreateSystemDefaultDevice()];
+    NSLog(@"MTKView's frame is %@\n", NSStringFromRect(self.view.frame));
+    self.view.frame = _frame;
+    _view = (MTKView *)self.view;
+    _view.clearColor = MTLClearColorMake(1.0, 1.0, 1.0, 1.0); // white
+    _distribution_renderer = [[RealtimeGraphRenderer alloc] initWithMTKView:_view];
+    _view.delegate = _distribution_renderer;
+    
+    NSButton *button = [NSButton buttonWithTitle:@"Button!" target:self action:@selector(buttonPressed)];
+    
+    button.frame = NSMakeRect(100, 100, 100, 100);
+    button.bezelColor = [NSColor systemPinkColor];
+    [self.view addSubview:button];
+    
+    [self.view addSubview:[[PolicyChooserView alloc] initWithFrame:NSMakeRect(100, 300, 100, 400) andDelegate:self]];
+}
+
+- (void)buttonPressed {
+    printf("Button was pressed. SEL is %s\n", _cmd);
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    srandomdev();
+
+    _policycompiler = [[PolicyCompiler alloc] initWithObject:self];
+
+    _threadpool = [[NSMutableArray alloc] initWithCapacity:num_threads];
+    for (int i = 0; i < num_threads; i++) {
+        [_threadpool addObject:[[SimulatorThread alloc] init]];
+    }
+    self.params = create_parameters(50, 50, 10, 10, 4.0, 5, default_policy);
+}
+
+// MARK: handle button presses
+/*
 - (IBAction)HeightChanged:(NSSlider *)sender {
     if (sender.intValue != _params -> block_height) {
         // printf("Modifying height, is now %d\n", sender.intValue);
@@ -51,39 +102,16 @@ static const int num_threads = 4;
 - (IBAction)BestPolicySet:(NSButton *)sender {
     [self change_policy:faster_policy];
 }
+ */
 
-- (void)change_policy:(PolicyFunc)new_policy {
-    if (new_policy != _params -> policy) {
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, new_policy);
-    }
-    // TODO: CHANGE LABEL SO USER KNOWS WHICH ONE IS DEFAULT AND WHICH ONE IS BETTER
-}
-
+/*
 - (IBAction)WidthChanged:(NSSlider *)sender {
     if (sender.intValue != _params -> block_width) {
         // printf("Modifying block width, is now %d\n", sender.intValue);
         self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, sender.intValue, _params -> stoplight_time, _params -> street_width, _params -> policy);
     }
 }
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    srandomdev();
-
-    _view = (MTKView *)self.view;
-    _view.device = MTLCreateSystemDefaultDevice();
-    _view.clearColor = MTLClearColorMake(1.0, 1.0, 1.0, 1.0); // white
-    _renderer = [[RealtimeGraphRenderer alloc] initWithMTKView:_view];
-    _view.delegate = _renderer;
-    
-    _policycompiler = [[PolicyCompiler alloc] initWithObject:self];
-
-    _threadpool = [[NSMutableArray alloc] initWithCapacity:num_threads];
-    for (int i = 0; i < num_threads; i++) {
-        [_threadpool addObject:[[SimulatorThread alloc] init]];
-    }
-    self.params = create_parameters(50, 50, 10, 10, 4.0, 5, default_policy);
-}
+ */
 
 - (void)dealloc
 {
@@ -94,7 +122,9 @@ static const int num_threads = 4;
     Parameters *old_params = _params;
     _params = params;
     [self invalidate];
-    free(old_params);
+    if (old_params != params) { // This is why I probably should have kept Parameters as an object...
+        free(old_params);
+    }
 }
 
 - (void)invalidate {
@@ -102,7 +132,7 @@ static const int num_threads = 4;
     [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
         [thread newParams:_params andResults:_results];
     }];
-    [_renderer setParams:_params andResults:_results];
+    [_distribution_renderer setParams:_params andResults:_results];
 }
 
 
@@ -115,6 +145,12 @@ static const int num_threads = 4;
 
 - (void)setCompiledPolicy:(nonnull PolicyFunc)policy {
     _compiled_policy = policy;
+}
+
+- (void)policyChanged:(nonnull PolicyFunc)newPolicy {
+    if (newPolicy != _params -> policy) {
+        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, newPolicy);
+    }
 }
 
 @end

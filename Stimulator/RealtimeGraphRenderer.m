@@ -23,18 +23,19 @@
     CGSize _viewportSize;
     Results *_results;
     Parameters *_params;
-
+    
+    // We use SceneKit for rendering text because the quantity of text we have to render is minimal, and doing text rendering on the GPU
+    // seems quite difficult.
     SKRenderer *_renderer;
     SKLabelNode *_textNode;
     SKLabelNode *_min_node;
     SKLabelNode *_max_node;
-    __weak IBOutlet NSTextField *mean_field;
 }
 
 - (instancetype)initWithMTKView:(MTKView *)view {
     if (self = [super init]) {
         _device = view.device;
-        
+
         // Load all the shader files with a .metal file extension in the project.
         id<MTLLibrary> defaultLibrary = [_device newDefaultLibrary];
 
@@ -42,7 +43,7 @@
         id<MTLFunction> secondTriangleFunction = [defaultLibrary newFunctionWithName:@"secondTriangle"];
         id<MTLFunction> meanLineFunction = [defaultLibrary newFunctionWithName:@"meanLine"];
         id<MTLFunction> fragmentFunction = [defaultLibrary newFunctionWithName:@"fragmentShader"];
-        
+
         // Configure a pipeline descriptor that is used to create a pipeline state.
         MTLRenderPipelineDescriptor *firstTriangleStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         firstTriangleStateDescriptor.label = @"First triangle Pipeline";
@@ -54,10 +55,9 @@
         if (error != nil) {
             NSLog(@"Encountered error with setting up first pipeline: %@", error);
         }
-        
+
         _viewportSize = view.drawableSize;
-        printf("setting initial size to %g %g\n", _viewportSize.height, _viewportSize.width);
-        
+
         MTLRenderPipelineDescriptor *secondTriangleStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         secondTriangleStateDescriptor.label = @"Second triangle Pipeline";
         secondTriangleStateDescriptor.vertexFunction = secondTriangleFunction;
@@ -68,7 +68,7 @@
         if (secondError != nil) {
             NSLog(@"Encountered error with setting up second pipeline: %@", secondError);
         }
-        
+
         MTLRenderPipelineDescriptor *meanLineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
         meanLineStateDescriptor.label = @"Mean line Pipeline";
         meanLineStateDescriptor.vertexFunction = meanLineFunction;
@@ -82,7 +82,7 @@
 
         // Create the command queue
         _commandQueue = [_device newCommandQueue];
-        
+
         _renderer = [SKRenderer rendererWithDevice:_device];
         _renderer.scene = [[SKScene alloc] initWithSize:_viewportSize];
 
@@ -91,13 +91,13 @@
         _textNode.fontSize = 20;
         _textNode.fontName = @"Arial";
         _textNode.hidden = true;
-        
+
         _min_node = [SKLabelNode labelNodeWithFontNamed:@"Arial"];
         _min_node.position = CGPointMake(100, 20);
 
         _max_node = [SKLabelNode labelNodeWithFontNamed:@"Arial"];
         _max_node.position = CGPointMake(800, 20);
-        
+
         [@[_min_node, _max_node] enumerateObjectsUsingBlock:^(SKLabelNode *  _Nonnull node, NSUInteger idx, BOOL * _Nonnull stop) {
             node.fontColor = [NSColor blackColor];
             node.fontSize = 20;
@@ -106,6 +106,7 @@
         }];
 
         [_renderer.scene addChild:_textNode];
+        NSLog(@"Succeeded Initializing RealtimeGraphRenderer, view is %@", view);
     }
     return self;
 }
@@ -115,8 +116,13 @@
     _results = results;
 }
 
+#define min(a,b) ((a) > (b) ? (b) : (a))
+
 - (int)num_boxes {
-    return _viewportSize.width * graph_width/3;
+    int max_screen_boxes = _viewportSize.width * graph_width/3;
+    int max_vertex_boxes = 1000; // boxes array must be < 4096 bytes, so max 1000 integers.
+    int max_range_boxes = 8*(_params->max_time - _params->min_time);
+    return min(min(max_screen_boxes, max_vertex_boxes), max_range_boxes);
 }
 
 - (float)mean {
@@ -163,20 +169,20 @@
     return box_range_values;
 }
 
-- (void)drawInMTKView:(nonnull MTKView *)view {    
+- (void)drawInMTKView:(nonnull MTKView *)view {
     if (!_params || !_results) {
         printf("Refusing to render...\n");
         return;
     }
-    
+
     MTLRenderPassDescriptor *renderPassDescriptor = view.currentRenderPassDescriptor;
     if (renderPassDescriptor == nil) {
         return;
     }
-        
+
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     id<MTLRenderCommandEncoder> commandEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
-    
+
     // generate data...
     int num_boxes = [self num_boxes];
     int *box_values = [self boxes:num_boxes];
@@ -186,12 +192,12 @@
     }
     float mean = self.mean;
     // printf("box_max is %d\n", box_max);
-    
+
     CGPoint mouseLocation = [NSEvent mouseLocation];
-    _textNode.position = CGPointMake(mouseLocation.x*2-300, mouseLocation.y*2-350);
-    _textNode.text = [NSString stringWithFormat:@"(%g, %g)", _textNode.position.x, _textNode.position.y];
+    _textNode.position = CGPointMake(mouseLocation.x*2, mouseLocation.y*2);
+    _textNode.text = [NSString stringWithFormat:@"%f%%", mean*100];
     _textNode.hidden = false;
-    
+
     _max_node.text = [NSString stringWithFormat:@"%d", _params -> max_time];
     _min_node.text = [NSString stringWithFormat:@"%d", _params -> min_time];
     // _max_node.position = CGPointMake(mouseLocation.x*2-350, mouseLocation.y*2-300);
@@ -207,7 +213,7 @@
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
-    
+
     // Draw second triangles
     [commandEncoder setRenderPipelineState:_secondTrianglePipeline];
     [commandEncoder setVertexBytes:box_values
@@ -216,22 +222,22 @@
     [commandEncoder setVertexBytes:&box_max length:sizeof(box_max) atIndex:GraphRendererInputIndexBoxTotal];
     [commandEncoder setVertexBytes:&num_boxes length:sizeof(num_boxes) atIndex:GraphRendererInputIndexNumBoxes];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:num_boxes*3];
-    
+
     [commandEncoder setRenderPipelineState:_meanLinePipeline];
     [commandEncoder setVertexBytes:&mean
                            length:sizeof(float)
                           atIndex:MeanLineInputIndexMean];
     [commandEncoder drawPrimitives:MTLPrimitiveTypeLine vertexStart:0 vertexCount:2];
-    
+
     [_renderer renderWithViewport:CGRectMake(0, 0, _viewportSize.width, _viewportSize.height) renderCommandEncoder:commandEncoder renderPassDescriptor:renderPassDescriptor commandQueue:_commandQueue];
 
     [commandEncoder endEncoding];
-    
+
     id<MTLDrawable> drawable = view.currentDrawable;
 
     // Request that the drawable texture be presented by the windowing system once drawing is done
     [commandBuffer presentDrawable:drawable];
-    
+
     [commandBuffer commit];
 }
 

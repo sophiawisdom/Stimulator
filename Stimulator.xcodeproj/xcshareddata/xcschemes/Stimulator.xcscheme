@@ -48,7 +48,9 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      enableAddressSanitizer = "YES"
       enableASanStackUseAfterReturn = "YES"
+      enableUBSanitizer = "YES"
       disableMainThreadChecker = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
@@ -66,6 +68,13 @@
             ReferencedContainer = "container:Stimulator.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <AdditionalOptions>
+         <AdditionalOption
+            key = "MallocScribble"
+            value = ""
+            isEnabled = "YES">
+         </AdditionalOption>
+      </AdditionalOptions>
       <LocationScenarioReference
          identifier = "San Francisco, CA, USA"
          referenceType = "1">

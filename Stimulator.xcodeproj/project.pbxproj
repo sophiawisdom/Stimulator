@@ -7,20 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6501710E2661360A00761393 /* PolicyChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6501710D2661360A00761393 /* PolicyChooserView.m */; };
 		655FCF7A2637D8FD004981A4 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
 		655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655FCF712637D8FB004981A4 /* libsimul.a */; };
 		659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E12624BB6200ED7E15 /* AppDelegate.m */; };
 		659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */; };
 		659CC7E72624BB6400ED7E15 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E62624BB6400ED7E15 /* Assets.xcassets */; };
-		659CC7EA2624BB6400ED7E15 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E82624BB6400ED7E15 /* Main.storyboard */; };
 		659CC7ED2624BB6400ED7E15 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7EC2624BB6400ED7E15 /* main.m */; };
-		659CC7F82624BB6400ED7E15 /* StimulatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7F72624BB6400ED7E15 /* StimulatorTests.m */; };
-		659CC8032624BB6400ED7E15 /* StimulatorUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8022624BB6400ED7E15 /* StimulatorUITests.m */; };
 		659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81726262C9300ED7E15 /* SimulatorThread.m */; };
 		659CC81B26262E0F00ED7E15 /* Results.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81A26262E0F00ED7E15 /* Results.m */; };
-		659CC81E262631A400ED7E15 /* Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81D262631A400ED7E15 /* Parameters.m */; };
 		659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */; };
 		659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8232626B29000ED7E15 /* GraphShader.metal */; };
+		65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */; };
+		65EA9FAA2648EBE400FE6900 /* libclang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
+		65EA9FAD2648ECE100FE6900 /* libclang.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
+		65EA9FB22648FF6B00FE6900 /* Diagnostic.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA9FB12648FF6B00FE6900 /* Diagnostic.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,7 +41,23 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		65EA9FAE2648ECE100FE6900 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				65EA9FAD2648ECE100FE6900 /* libclang.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		6501710C2661360A00761393 /* PolicyChooserView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PolicyChooserView.h; sourceTree = "<group>"; };
+		6501710D2661360A00761393 /* PolicyChooserView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PolicyChooserView.m; sourceTree = "<group>"; };
 		655FCF712637D8FB004981A4 /* libsimul.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsimul.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7DD2624BB6200ED7E15 /* Stimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7E02624BB6200ED7E15 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -48,28 +65,26 @@
 		659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealtimeGraphController.h; sourceTree = "<group>"; };
 		659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealtimeGraphController.m; sourceTree = "<group>"; };
 		659CC7E62624BB6400ED7E15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		659CC7E92624BB6400ED7E15 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		659CC7EB2624BB6400ED7E15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		659CC7EC2624BB6400ED7E15 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		659CC7EE2624BB6400ED7E15 /* Stimulator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Stimulator.entitlements; sourceTree = "<group>"; };
 		659CC7F32624BB6400ED7E15 /* StimulatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StimulatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		659CC7F72624BB6400ED7E15 /* StimulatorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StimulatorTests.m; sourceTree = "<group>"; };
-		659CC7F92624BB6400ED7E15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		659CC7FE2624BB6400ED7E15 /* StimulatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StimulatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		659CC8022624BB6400ED7E15 /* StimulatorUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StimulatorUITests.m; sourceTree = "<group>"; };
-		659CC8042624BB6400ED7E15 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		659CC8102624BB8200ED7E15 /* Simul.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Simul.h; sourceTree = "<group>"; };
 		659CC8112624BB8200ED7E15 /* Simul.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Simul.c; sourceTree = "<group>"; };
 		659CC81626262C9300ED7E15 /* SimulatorThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimulatorThread.h; sourceTree = "<group>"; };
 		659CC81726262C9300ED7E15 /* SimulatorThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimulatorThread.m; sourceTree = "<group>"; };
 		659CC81926262E0F00ED7E15 /* Results.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Results.h; sourceTree = "<group>"; };
 		659CC81A26262E0F00ED7E15 /* Results.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Results.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		659CC81C262631A400ED7E15 /* Parameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parameters.h; sourceTree = "<group>"; };
-		659CC81D262631A400ED7E15 /* Parameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Parameters.m; sourceTree = "<group>"; };
 		659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealtimeGraphRenderer.h; sourceTree = "<group>"; };
 		659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealtimeGraphRenderer.m; sourceTree = "<group>"; };
 		659CC8222626A95700ED7E15 /* GraphRendererHeaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphRendererHeaders.h; sourceTree = "<group>"; };
 		659CC8232626B29000ED7E15 /* GraphShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GraphShader.metal; sourceTree = "<group>"; };
+		65EA9FA62648E32F00FE6900 /* PolicyCompiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PolicyCompiler.h; sourceTree = "<group>"; };
+		65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PolicyCompiler.m; sourceTree = "<group>"; };
+		65EA9FA92648EBE400FE6900 /* libclang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclang.dylib; path = ../../../Library/Developer/CommandLineTools/usr/lib/libclang.dylib; sourceTree = "<group>"; };
+		65EA9FB02648FF6B00FE6900 /* Diagnostic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Diagnostic.h; sourceTree = "<group>"; };
+		65EA9FB12648FF6B00FE6900 /* Diagnostic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Diagnostic.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65EA9FAA2648EBE400FE6900 /* libclang.dylib in Frameworks */,
 				655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -108,6 +124,7 @@
 		655FCF7B2637D90A004981A4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				65EA9FA92648EBE400FE6900 /* libclang.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -116,8 +133,6 @@
 			isa = PBXGroup;
 			children = (
 				659CC7DF2624BB6200ED7E15 /* Stimulator */,
-				659CC7F62624BB6400ED7E15 /* StimulatorTests */,
-				659CC8012624BB6400ED7E15 /* StimulatorUITests */,
 				659CC7DE2624BB6200ED7E15 /* Products */,
 				655FCF7B2637D90A004981A4 /* Frameworks */,
 			);
@@ -141,20 +156,20 @@
 				659CC7E12624BB6200ED7E15 /* AppDelegate.m */,
 				659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */,
 				659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */,
+				6501710C2661360A00761393 /* PolicyChooserView.h */,
+				6501710D2661360A00761393 /* PolicyChooserView.m */,
 				659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */,
 				659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */,
 				659CC8232626B29000ED7E15 /* GraphShader.metal */,
 				659CC8222626A95700ED7E15 /* GraphRendererHeaders.h */,
 				659CC81926262E0F00ED7E15 /* Results.h */,
 				659CC81A26262E0F00ED7E15 /* Results.m */,
-				659CC81C262631A400ED7E15 /* Parameters.h */,
-				659CC81D262631A400ED7E15 /* Parameters.m */,
 				659CC81626262C9300ED7E15 /* SimulatorThread.h */,
 				659CC81726262C9300ED7E15 /* SimulatorThread.m */,
+				65EA9FAF2648FF5E00FE6900 /* Compiler */,
 				659CC8102624BB8200ED7E15 /* Simul.h */,
 				659CC8112624BB8200ED7E15 /* Simul.c */,
 				659CC7E62624BB6400ED7E15 /* Assets.xcassets */,
-				659CC7E82624BB6400ED7E15 /* Main.storyboard */,
 				659CC7EB2624BB6400ED7E15 /* Info.plist */,
 				659CC7EC2624BB6400ED7E15 /* main.m */,
 				659CC7EE2624BB6400ED7E15 /* Stimulator.entitlements */,
@@ -162,22 +177,15 @@
 			path = Stimulator;
 			sourceTree = "<group>";
 		};
-		659CC7F62624BB6400ED7E15 /* StimulatorTests */ = {
+		65EA9FAF2648FF5E00FE6900 /* Compiler */ = {
 			isa = PBXGroup;
 			children = (
-				659CC7F72624BB6400ED7E15 /* StimulatorTests.m */,
-				659CC7F92624BB6400ED7E15 /* Info.plist */,
+				65EA9FA62648E32F00FE6900 /* PolicyCompiler.h */,
+				65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */,
+				65EA9FB02648FF6B00FE6900 /* Diagnostic.h */,
+				65EA9FB12648FF6B00FE6900 /* Diagnostic.m */,
 			);
-			path = StimulatorTests;
-			sourceTree = "<group>";
-		};
-		659CC8012624BB6400ED7E15 /* StimulatorUITests */ = {
-			isa = PBXGroup;
-			children = (
-				659CC8022624BB6400ED7E15 /* StimulatorUITests.m */,
-				659CC8042624BB6400ED7E15 /* Info.plist */,
-			);
-			path = StimulatorUITests;
+			path = Compiler;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +225,7 @@
 				659CC7D92624BB6200ED7E15 /* Sources */,
 				659CC7DA2624BB6200ED7E15 /* Frameworks */,
 				659CC7DB2624BB6200ED7E15 /* Resources */,
+				65EA9FAE2648ECE100FE6900 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -315,7 +324,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				659CC7E72624BB6400ED7E15 /* Assets.xcassets in Resources */,
-				659CC7EA2624BB6400ED7E15 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,11 +358,13 @@
 			files = (
 				659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */,
 				659CC7ED2624BB6400ED7E15 /* main.m in Sources */,
+				65EA9FB22648FF6B00FE6900 /* Diagnostic.m in Sources */,
 				659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */,
-				659CC81E262631A400ED7E15 /* Parameters.m in Sources */,
 				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
 				659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */,
+				6501710E2661360A00761393 /* PolicyChooserView.m in Sources */,
 				659CC81B26262E0F00ED7E15 /* Results.m in Sources */,
+				65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */,
 				659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -363,7 +373,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659CC7F82624BB6400ED7E15 /* StimulatorTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,7 +380,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659CC8032624BB6400ED7E15 /* StimulatorUITests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,17 +397,6 @@
 			targetProxy = 659CC7FF2624BB6400ED7E15 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		659CC7E82624BB6400ED7E15 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				659CC7E92624BB6400ED7E15 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		655FCF782637D8FB004981A4 /* Debug */ = {
@@ -551,12 +548,13 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_FAST_MATH = YES;
-				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = Stimulator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Library/Developer/CommandLineTools/usr/lib;
 				LLVM_LTO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.tweaks.Stimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -574,12 +572,13 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_FAST_MATH = YES;
-				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = Stimulator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = /Library/Developer/CommandLineTools/usr/lib;
 				LLVM_LTO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.tweaks.Stimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
