@@ -5,11 +5,13 @@
 #include <math.h>
 #include "Simul.h"
 
+// How long is the stoplight's cycle time
 double get_stoplight_time(struct simul *simulation, int x, int y) {
-    // Instead of pre-calculating the stoplight times, we load the dynamically
+    // Instead of pre-calculating the stoplight times, we load them dynamically
     int index = x * simulation -> params.blocks_high + y;
     if (simulation -> times[index] == 0) {
-        double value = (double)random()/(double)(RAND_MAX/simulation->params.stoplight_time);
+        // value from stoplight_time/2 to 3*stoplight_time/2
+        double value = (double)random()/(double)(simulation -> rand_quotient) + simulation->half_stoplight_time;
         simulation -> times[index] = value;
         return value;
     }
@@ -17,23 +19,25 @@ double get_stoplight_time(struct simul *simulation, int x, int y) {
 }
 
 double stoplight_wait(struct simul *simulation, PolicyResult direction) {
+    // TODO: how to account for the fact this is useless to e.g. ask stoplight wait to go top if there's no light top
     int effective_x = simulation -> current_x - !simulation->x_right + 1;
     int effective_y = simulation -> current_y - !simulation->y_top + 1;
 #ifdef SIMUL_DEBUG
     printf("effective_x is %d, effective_y is %d\n", effective_x, effective_y);
 #endif
+    
+    // The whole system cycles every s_t*2 seconds. get_stoplight_time returns when "top" switches to "right", which can be from .5-1.5*s_t
     double stoplight_time = get_stoplight_time(simulation, effective_x, effective_y);
-
-    float current_time = fmodf(simulation -> cur_t, (simulation -> params.stoplight_time * 3.0f));
-    float cycle_time = simulation -> params.stoplight_time * 3;
+    float cycle_time = simulation -> twice_stoplight_time;
+    float current_time = fmodf(simulation -> cur_t, cycle_time);
     if (direction == Top) {
-        if (current_time <= stoplight_time) {
+        if (current_time <= stoplight_time) { // Green light to go Top
             return 0;
         } else {
             return cycle_time - current_time;
         }
     } else if (direction == Right) {
-        if (current_time <= stoplight_time) {
+        if (current_time < stoplight_time) {
             return stoplight_time - current_time;
         } else {
             return 0;
@@ -311,6 +315,10 @@ struct diagnostics simulate(Parameters *params) {
 
     simulation -> x_right = false;
     simulation -> y_top = false;
+    
+    simulation -> rand_quotient = RAND_MAX/(simulation->params.stoplight_time);
+    simulation -> half_stoplight_time = simulation->params.stoplight_time/2;
+    simulation -> twice_stoplight_time = simulation->params.stoplight_time*2;
     
     if (simulation -> params.blocks_wide > 1000 || simulation -> params.blocks_high > 1000) {
         printf("GOT WEIRD PARAMETERS: %d %d\n", simulation -> params.blocks_wide, simulation -> params.blocks_high);

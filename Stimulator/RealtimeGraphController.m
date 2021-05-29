@@ -75,7 +75,7 @@ static const unsigned int num_threads = 1;
     for (int i = 0; i < num_threads; i++) {
         [_threadpool addObject:[[SimulatorThread alloc] init]];
     }
-    self.params = create_parameters(50, 50, 10, 10, 4.0, 5, default_policy);
+    self.params = create_parameters(50, 50, 30, 30, 10.0, 2, default_policy);
 }
 
 // MARK: handle button presses

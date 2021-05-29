@@ -46,6 +46,11 @@ struct simul {
     bool y_top; // true: we're at the top of the block. false: we're at the bottom of the block
 
     float cur_t;
+    
+    // Caches. It's probably faster to get these values from l1 cache than it is to calculate them...
+    double rand_quotient;
+    double twice_stoplight_time;
+    double half_stoplight_time;
 };
 
 struct diagnostics simulate(Parameters *params);
