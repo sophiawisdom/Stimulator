@@ -10,14 +10,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define RESULTS_SPECIFICITY_MULTIPLIER (8)
+
 @interface Results : NSObject
 
 - (instancetype)initWithMin:(int)min Max:(int)max MaxWriters: (int)max_writers;
 
-@property (nonatomic, readonly) int size;
+// Used for determining speed of simulate() function
+#ifdef SPEED_CHECK
+@property (nonatomic, readonly) long long num_results; // approximate number of results, no guarantee on freshness
+@property (nonatomic, readonly) long long beginning; // unix time µs at which this was created
+#endif
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock;
-- (long long)writeValues: (int *)values count:(int)count; // Retval is total number of values written, or -1 in case of error. This is a simple wrapper over acquireLock.
+- (long long)writeValues: (int *)values count:(int)count;
 
 @end
 

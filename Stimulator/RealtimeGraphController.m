@@ -14,9 +14,9 @@
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
 #import "PolicyCompiler.h"
-#import "PolicyChooserView.h"
+#import "ParamsChooserView.h"
 
-static const unsigned int num_threads = 1;
+static const unsigned int num_threads = 4;
 
 @implementation RealtimeGraphController {
     NSRect _frame;
@@ -51,18 +51,9 @@ static const unsigned int num_threads = 1;
     _view.clearColor = MTLClearColorMake(1.0, 1.0, 1.0, 1.0); // white
     _distribution_renderer = [[RealtimeGraphRenderer alloc] initWithMTKView:_view];
     _view.delegate = _distribution_renderer;
-    
-    NSButton *button = [NSButton buttonWithTitle:@"Button!" target:self action:@selector(buttonPressed)];
-    
-    button.frame = NSMakeRect(100, 100, 100, 100);
-    button.bezelColor = [NSColor systemPinkColor];
-    [self.view addSubview:button];
-    
-    [self.view addSubview:[[PolicyChooserView alloc] initWithFrame:NSMakeRect(100, 300, 100, 400) andDelegate:self]];
-}
 
-- (void)buttonPressed {
-    printf("Button was pressed. SEL is %s\n", _cmd);
+    ParamsChooserView *params_chooser = [[ParamsChooserView alloc] initWithFrame:NSMakeRect(500, 300, 500, 400) andDelegate:self];
+    [self.view addSubview:params_chooser];
 }
 
 - (void)viewDidLoad {
@@ -76,6 +67,7 @@ static const unsigned int num_threads = 1;
         [_threadpool addObject:[[SimulatorThread alloc] init]];
     }
     self.params = create_parameters(50, 50, 30, 30, 10.0, 2, default_policy);
+    // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
 }
 
 // MARK: handle button presses
@@ -151,6 +143,10 @@ static const unsigned int num_threads = 1;
     if (newPolicy != _params -> policy) {
         self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, newPolicy);
     }
+}
+
+- (void)paramsChanged:(nonnull Parameters *)newPolicy {
+    self.params = newPolicy;
 }
 
 @end

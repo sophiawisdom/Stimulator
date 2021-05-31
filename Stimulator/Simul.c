@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 #include "Simul.h"
 
 // How long is the stoplight's cycle time
@@ -26,15 +27,15 @@ double stoplight_wait(struct simul *simulation, PolicyResult direction) {
     printf("effective_x is %d, effective_y is %d\n", effective_x, effective_y);
 #endif
     
-    // The whole system cycles every s_t*2 seconds. get_stoplight_time returns when "top" switches to "right", which can be from .5-1.5*s_t
+    // get_stoplight_time returns its cycle time, which is evenly split between top and right. Starts top then goes right.
     double stoplight_time = get_stoplight_time(simulation, effective_x, effective_y);
-    float cycle_time = simulation -> twice_stoplight_time;
-    float current_time = fmodf(simulation -> cur_t, cycle_time);
+    double twice_stoplight_time = stoplight_time*2;
+    float current_time = fmodf(simulation -> cur_t, twice_stoplight_time);
     if (direction == Top) {
         if (current_time <= stoplight_time) { // Green light to go Top
             return 0;
         } else {
-            return cycle_time - current_time;
+            return (twice_stoplight_time - current_time);
         }
     } else if (direction == Right) {
         if (current_time < stoplight_time) {
@@ -358,4 +359,8 @@ Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight,
     params -> min_time = blocksWide*blockWidth + blocksHigh*blockHeight + streetWidth*(blocksHigh-1+blocksWide-1);
     params -> max_time = params -> min_time + stoplightTime*2*(blocksHigh+blocksWide);
     return params;
+}
+
+bool parameters_equal(Parameters *restrict first, Parameters *restrict second) {
+    return memcmp(first, second, sizeof(Parameters)) == 0;
 }

@@ -20,8 +20,6 @@ typedef struct Parameters {
     int min_time;
 } Parameters;
 
-Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
-
 struct diagnostics {
     int time_waiting;
     double total_time;
@@ -66,10 +64,26 @@ typedef struct PolicyFunction {
     char *name; // used for UI
 } PolicyFunction;
 
+// Showed in the UI from bottom to top
 static const PolicyFunction policies[5] = {
     {.policy = faster_policy_2, .name="new faster policy"},
     {.policy = faster_policy, .name="faster policy"},
     {.policy = avoid_waiting_policy_2, .name="new avoid waiting policy"},
     {.policy = avoid_waiting_policy, .name="avoid waiting policy"},
     {.policy = default_policy, .name="default policy"}
+};
+
+Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
+bool parameters_equal(Parameters *first, Parameters *second);
+// create_parameters(50, 50, 30, 30, 10.0, 2, default_policy)
+const static Parameters default_params = {
+    .blocks_wide = 50,
+    .blocks_high = 50,
+    .block_height = 30.0f,
+    .block_width = 30.0f,
+    .stoplight_time = 10.0f,
+    .street_width = 2.0f,
+    .policy = default_policy,
+    .min_time = 3196,
+    .max_time = 5196
 };

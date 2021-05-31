@@ -10,6 +10,8 @@
 #import "GraphRendererHeaders.h"
 #import "SimulatorThread.h"
 
+#import <sys/time.h>
+
 #import <SpriteKit/SpriteKit.h>
 
 @implementation RealtimeGraphRenderer {
@@ -121,7 +123,7 @@
 - (int)num_boxes {
     int max_screen_boxes = _viewportSize.width * graph_width/3;
     int max_vertex_boxes = 1000; // boxes array must be < 4096 bytes, so max 1000 integers.
-    int max_range_boxes = 8*(_params->max_time - _params->min_time);
+    int max_range_boxes = RESULTS_SPECIFICITY_MULTIPLIER*(_params->max_time - _params->min_time);
     return min(min(max_screen_boxes, max_vertex_boxes), max_range_boxes);
 }
 
@@ -130,7 +132,7 @@
     __block double total = 0;
     __block double count = 0;
     [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
-        double diff = (max-min)*8;
+        double diff = (max-min)*RESULTS_SPECIFICITY_MULTIPLIER;
         for (int i = 0; i < diff; i++) {
             total += (i * results[i])/diff; // Ultimately we want a value between 0 and 1 for use in the UI.
             count += results[i];
@@ -145,7 +147,7 @@
     // printf("num_boxes is %d\n", nu)
 
     [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
-        int length = (max-min)*8;
+        int length = (max-min)*RESULTS_SPECIFICITY_MULTIPLIER;
         for (int i = 0; i < length; i++) {
             int index = (i*num_boxes)/length;
             box_range_values[index] += results[i];
@@ -192,6 +194,16 @@
     }
     float mean = self.mean;
     // printf("box_max is %d\n", box_max);
+
+#ifdef SPEED_CHECK
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    long long time = tv.tv_sec*1000*1000 + tv.tv_usec;
+    long long diff = time - _results.beginning;
+    double t_diff = diff/(1000000.0);
+    double time_taken = diff/(_results.num_results > 0 ? _results.num_results : 1);
+    printf("It's been %g seconds and there have been %lld results written (%g µs/results)\n", t_diff, _results.num_results, time_taken);
+#endif
 
     CGPoint mouseLocation = [NSEvent mouseLocation];
     _textNode.position = CGPointMake(mouseLocation.x*2, mouseLocation.y*2);

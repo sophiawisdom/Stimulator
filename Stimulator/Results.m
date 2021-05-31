@@ -8,6 +8,7 @@
 
 #import "Results.h"
 #import "SimulatorThread.h"
+#include <sys/time.h>
 
 @implementation Results {
     _Atomic int *_results; // length of blocks_wide*block_width + blocks_high*block_height + (stoplight_time + street_wide)*(blocks_high+blocks_wide), which should be maximum time
@@ -16,6 +17,8 @@
     int _max;
     int _max_writers;
     dispatch_semaphore_t _results_lock;
+    
+    long long _begin_time;
 }
 
 - (instancetype)initWithMin:(int)min Max:(int)max MaxWriters: (int)max_writers {
@@ -29,13 +32,27 @@
 
         // Acquire lock to use these
         _num_results = 0;
-        _results = calloc(sizeof(int), (max-min)*8);
+        _results = calloc(sizeof(int), (max-min)*RESULTS_SPECIFICITY_MULTIPLIER);
+
+#ifdef SPEED_CHECK
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        _begin_time = (tv.tv_sec*1000*1000) + tv.tv_usec;
+#endif
     }
     return self;
 }
 
 - (int)size {
     return _max-_min;
+}
+
+- (long long)num_results {
+    return _num_results;
+}
+
+- (long long)beginning {
+    return _begin_time;
 }
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {
@@ -59,7 +76,7 @@
 
     dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER); // If this hits the kernel every time,
     // that would suck. Right now it isn't a big problem, but ideally we could do this userside.
-    int adjusted_min = _min*8;
+    int adjusted_min = _min*RESULTS_SPECIFICITY_MULTIPLIER;
     for (int i = 0; i < count; i++) {
         _results[values[i]-adjusted_min] += 1;
     }

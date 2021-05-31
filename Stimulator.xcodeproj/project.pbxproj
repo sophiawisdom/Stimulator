@@ -18,6 +18,7 @@
 		659CC81B26262E0F00ED7E15 /* Results.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC81A26262E0F00ED7E15 /* Results.m */; };
 		659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */; };
 		659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8232626B29000ED7E15 /* GraphShader.metal */; };
+		65D02E3B2663BB7D00DCC7D8 /* ParamsChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D02E3A2663BB7D00DCC7D8 /* ParamsChooserView.m */; };
 		65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */; };
 		65EA9FAA2648EBE400FE6900 /* libclang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
 		65EA9FAD2648ECE100FE6900 /* libclang.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
@@ -80,6 +81,8 @@
 		659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealtimeGraphRenderer.m; sourceTree = "<group>"; };
 		659CC8222626A95700ED7E15 /* GraphRendererHeaders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphRendererHeaders.h; sourceTree = "<group>"; };
 		659CC8232626B29000ED7E15 /* GraphShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GraphShader.metal; sourceTree = "<group>"; };
+		65D02E392663BB7D00DCC7D8 /* ParamsChooserView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParamsChooserView.h; sourceTree = "<group>"; };
+		65D02E3A2663BB7D00DCC7D8 /* ParamsChooserView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ParamsChooserView.m; sourceTree = "<group>"; };
 		65EA9FA62648E32F00FE6900 /* PolicyCompiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PolicyCompiler.h; sourceTree = "<group>"; };
 		65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PolicyCompiler.m; sourceTree = "<group>"; };
 		65EA9FA92648EBE400FE6900 /* libclang.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclang.dylib; path = ../../../Library/Developer/CommandLineTools/usr/lib/libclang.dylib; sourceTree = "<group>"; };
@@ -156,6 +159,8 @@
 				659CC7E12624BB6200ED7E15 /* AppDelegate.m */,
 				659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */,
 				659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */,
+				65D02E392663BB7D00DCC7D8 /* ParamsChooserView.h */,
+				65D02E3A2663BB7D00DCC7D8 /* ParamsChooserView.m */,
 				6501710C2661360A00761393 /* PolicyChooserView.h */,
 				6501710D2661360A00761393 /* PolicyChooserView.m */,
 				659CC81F262660A800ED7E15 /* RealtimeGraphRenderer.h */,
@@ -363,6 +368,7 @@
 				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
 				659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */,
 				6501710E2661360A00761393 /* PolicyChooserView.m in Sources */,
+				65D02E3B2663BB7D00DCC7D8 /* ParamsChooserView.m in Sources */,
 				659CC81B26262E0F00ED7E15 /* Results.m in Sources */,
 				65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */,
 				659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */,

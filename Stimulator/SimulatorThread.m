@@ -94,23 +94,12 @@ static volatile int thread_num = 0;
 - (void)flush_cache {
     long long total_written = [_results writeValues:self->_results_cache count:_cache_used];
     _cache_used = 0;
-    /*
-    long done_time = clock();
-    if (_last_flush != -1) {
-        _total_flush_time += done_time - _last_flush;
-        _num_flushes++;
-    }
-    _last_flush = done_time;
-     */
     if (total_written == -1 || total_written > max_results) {
         // If we've already written enough, put the thread in hibernation until the parameters change.
         // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
         // but I thought this would be lower-latency, and more accurately describes the intended semantics
         // ("sleep until something's changed").
-        // printf("SUSPENDING THREAD %s. Did %ld flushes in %ld total time, average %g\n", _thread.name.UTF8String, _num_flushes, _total_flush_time, ( (double)_total_flush_time)/((double)_num_flushes));
         thread_suspend(_thread_port);
-        // printf("UNSUSPENDED THREAD %s\n", _thread.name.UTF8String);
-        // _last_flush = clock();
     }
 }
 
@@ -125,7 +114,7 @@ static volatile int thread_num = 0;
 
         struct diagnostics result = simulate(_params);
 
-        _results_cache[_cache_used++] = result.total_time * 8;
+        _results_cache[_cache_used++] = result.total_time * RESULTS_SPECIFICITY_MULTIPLIER;
         if (_cache_used == cache_size) {
             [self flush_cache];
         }

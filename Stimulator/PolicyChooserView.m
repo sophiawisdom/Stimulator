@@ -18,21 +18,32 @@
 {
     if (self = [super initWithFrame:frame]) {
         _delegate = delegate;
+        int num_policies = sizeof(policies)/sizeof(PolicyFunction);
+        for (int i = 0; i < num_policies; i++) {
+            PolicyFunction policy_func = policies[i];
+            NSButton *button = [NSButton radioButtonWithTitle:[NSString stringWithUTF8String:policy_func.name] target:self action:@selector(buttonPressed:)];
+            button.frame = NSMakeRect(0, i*40, 100, 30);
+            [button setWantsLayer:YES];
+            button.layer.backgroundColor = [NSColor colorWithCalibratedRed:0.87f green:0.22f blue:0.03f alpha:1].CGColor;
+            button.layer.cornerRadius = 4;
+            button.layer.masksToBounds = true;
+            if (policy_func.policy == default_policy) {
+                button.state = NSControlStateValueOn;
+            }
+            [self addSubview:button];
+        }
+
+        NSTextField *_policiesLabel = [NSTextField labelWithString:@"Policies"];
+        // [_policiesLabel setFont:[NSFont systemFontOfSize:15]];
+        printf("num_policies is %d, bigger is %d\n", num_policies, num_policies*40);
+        _policiesLabel.frame = NSMakeRect(0, (num_policies*40), 200, 50);
+        [self addSubview:_policiesLabel];
     }
     return self;
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
-        
-    for (int i = 0; i < sizeof(policies)/sizeof(PolicyFunction); i++) {
-        PolicyFunction policy_func = policies[i];
-        NSButton *button = [NSButton radioButtonWithTitle:[NSString stringWithUTF8String:policy_func.name] target:self action:@selector(buttonPressed:)];
-        button.frame = NSMakeRect(0, 0 + (i*40), 100, 30);
-        [button setWantsLayer:YES];
-        button.layer.backgroundColor = [NSColor colorWithCalibratedRed:0.121f green:0.4375f blue:0.1992f alpha:0.2578f].CGColor;
-        [self addSubview:button];
-    }
     // Drawing code here.
 }
 
