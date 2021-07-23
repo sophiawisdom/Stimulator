@@ -355,12 +355,32 @@ Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight,
     params -> stoplight_time = stoplightTime;
     params -> street_width = streetWidth;
     params -> policy = policy;
-
-    params -> min_time = blocksWide*blockWidth + blocksHigh*blockHeight + streetWidth*(blocksHigh-1+blocksWide-1);
-    params -> max_time = params -> min_time + stoplightTime*2*(blocksHigh+blocksWide);
+    
+    // extra 5 here is for safety. i know this is dumb
+    params -> min_time = blocksWide*blockWidth + blocksHigh*blockHeight + streetWidth*(blocksHigh-1+blocksWide-1) - 5;
+    params -> max_time = params -> min_time + stoplightTime*2*(blocksHigh+blocksWide) + 10;
     return params;
 }
 
 bool parameters_equal(Parameters *restrict first, Parameters *restrict second) {
     return memcmp(first, second, sizeof(Parameters)) == 0;
+}
+
+/*
+ int blocks_wide;
+ int blocks_high;
+ float block_height;
+ float block_width;
+ float stoplight_time;
+ float street_width;
+ PolicyFunc policy;
+
+ int max_time;
+ int min_time;
+ */
+
+char *parameters_description(Parameters *params) {
+    char *out = NULL;
+    asprintf(&out, "{blocks_wide = %d, blocks_high = %d, block_height = %g, block_width = %g, stoplight_time = %g, street_width = %g, policy = %p, min_time = %d, max_time = %d", params -> blocks_wide, params -> blocks_high, params -> block_height, params -> block_width, params -> stoplight_time, params -> street_width, params -> policy, params -> min_time, params -> max_time);
+    return out;
 }

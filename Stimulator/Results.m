@@ -80,7 +80,7 @@
     for (int i = 0; i < count; i++) {
         _results[values[i]-adjusted_min] += 1;
     }
-    
+
     _num_results += count;
     dispatch_semaphore_signal(_results_lock);
     return _num_results;
@@ -88,7 +88,16 @@
 
 - (void)dealloc
 {
-    // could we somehow free all the waiters here? Perhaps destroy the semaphore? idk...
+    // Wait for all the writers to exit before we dealloc. Not sure how this is happening though, because
+    // if something is writing to the object it should hold a reference...
+    for (int i = 0; i < _max_writers; i++) {
+        dispatch_semaphore_wait(_results_lock, DISPATCH_TIME_FOREVER);
+    }
+    
+    for (int i = 0; i < _max_writers; i++) {
+        dispatch_semaphore_signal(_results_lock);
+    }
+
     free(_results);
 }
 

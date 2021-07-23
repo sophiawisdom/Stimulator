@@ -70,41 +70,6 @@ static const unsigned int num_threads = 4;
     // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
 }
 
-// MARK: handle button presses
-/*
-- (IBAction)HeightChanged:(NSSlider *)sender {
-    if (sender.intValue != _params -> block_height) {
-        // printf("Modifying height, is now %d\n", sender.intValue);
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, sender.intValue, _params -> block_width, _params -> stoplight_time, _params -> street_width, _params -> policy);
-    }
-}
-
-- (IBAction)StoplightTimeChanged:(NSSlider *)sender {
-    if (sender.floatValue != _params -> stoplight_time) {
-        // printf("Modifying stoplight time, is now %d\n", sender.intValue);
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, sender.floatValue, _params -> street_width, _params -> policy);
-    }
-}
-- (IBAction)DefaultPolicySet:(NSButton *)sender {
-    [self change_policy:default_policy];
-}
-- (IBAction)BetterPolicySet:(NSButton *)sender {
-    [self change_policy:avoid_waiting_policy];
-}
-- (IBAction)BestPolicySet:(NSButton *)sender {
-    [self change_policy:faster_policy];
-}
- */
-
-/*
-- (IBAction)WidthChanged:(NSSlider *)sender {
-    if (sender.intValue != _params -> block_width) {
-        // printf("Modifying block width, is now %d\n", sender.intValue);
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, sender.intValue, _params -> stoplight_time, _params -> street_width, _params -> policy);
-    }
-}
- */
-
 - (void)dealloc
 {
     free(_params);
@@ -113,40 +78,14 @@ static const unsigned int num_threads = 4;
 - (void)setParams:(Parameters *)params {
     Parameters *old_params = _params;
     _params = params;
-    [self invalidate];
-    if (old_params != params) { // This is why I probably should have kept Parameters as an object...
-        free(old_params);
-    }
-}
-
-- (void)invalidate {
     _results = [[Results alloc] initWithMin:_params -> min_time Max:_params -> max_time MaxWriters:num_threads];
     [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
         [thread newParams:_params andResults:_results];
     }];
     [_distribution_renderer setParams:_params andResults:_results];
-}
-
-
-- (void)setRepresentedObject:(id)representedObject {
-    [super setRepresentedObject:representedObject];
-
-    // Update the view, if already loaded.
-}
-
-
-- (void)setCompiledPolicy:(nonnull PolicyFunc)policy {
-    _compiled_policy = policy;
-}
-
-- (void)policyChanged:(nonnull PolicyFunc)newPolicy {
-    if (newPolicy != _params -> policy) {
-        self.params = create_parameters(_params -> blocks_wide, _params -> blocks_high, _params -> block_height, _params -> block_width, _params -> stoplight_time, _params -> street_width, newPolicy);
+    if (old_params != params) { // This is why I probably should have kept Parameters as an object...
+        free(old_params);
     }
-}
-
-- (void)paramsChanged:(nonnull Parameters *)newPolicy {
-    self.params = newPolicy;
 }
 
 @end

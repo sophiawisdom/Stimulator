@@ -114,6 +114,7 @@
 }
 
 - (void)setParams: (Parameters *)params andResults: (Results *)results {
+    // MAIN THREAD ONLY
     _params = params;
     _results = results;
 }

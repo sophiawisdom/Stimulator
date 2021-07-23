@@ -10,6 +10,7 @@
 		6501710E2661360A00761393 /* PolicyChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6501710D2661360A00761393 /* PolicyChooserView.m */; };
 		655FCF7A2637D8FD004981A4 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
 		655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655FCF712637D8FB004981A4 /* libsimul.a */; };
+		658B6B9D2666DBE3007AB80F /* ParametersObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 658B6B9C2666DBE3007AB80F /* ParametersObject.m */; };
 		659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E12624BB6200ED7E15 /* AppDelegate.m */; };
 		659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */; };
 		659CC7E72624BB6400ED7E15 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 659CC7E62624BB6400ED7E15 /* Assets.xcassets */; };
@@ -60,6 +61,8 @@
 		6501710C2661360A00761393 /* PolicyChooserView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PolicyChooserView.h; sourceTree = "<group>"; };
 		6501710D2661360A00761393 /* PolicyChooserView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PolicyChooserView.m; sourceTree = "<group>"; };
 		655FCF712637D8FB004981A4 /* libsimul.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsimul.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		658B6B9B2666DBE3007AB80F /* ParametersObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParametersObject.h; sourceTree = "<group>"; };
+		658B6B9C2666DBE3007AB80F /* ParametersObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ParametersObject.m; sourceTree = "<group>"; };
 		659CC7DD2624BB6200ED7E15 /* Stimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		659CC7E02624BB6200ED7E15 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		659CC7E12624BB6200ED7E15 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -174,6 +177,8 @@
 				65EA9FAF2648FF5E00FE6900 /* Compiler */,
 				659CC8102624BB8200ED7E15 /* Simul.h */,
 				659CC8112624BB8200ED7E15 /* Simul.c */,
+				658B6B9B2666DBE3007AB80F /* ParametersObject.h */,
+				658B6B9C2666DBE3007AB80F /* ParametersObject.m */,
 				659CC7E62624BB6400ED7E15 /* Assets.xcassets */,
 				659CC7EB2624BB6400ED7E15 /* Info.plist */,
 				659CC7EC2624BB6400ED7E15 /* main.m */,
@@ -369,6 +374,7 @@
 				659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */,
 				6501710E2661360A00761393 /* PolicyChooserView.m in Sources */,
 				65D02E3B2663BB7D00DCC7D8 /* ParamsChooserView.m in Sources */,
+				658B6B9D2666DBE3007AB80F /* ParametersObject.m in Sources */,
 				659CC81B26262E0F00ED7E15 /* Results.m in Sources */,
 				65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */,
 				659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */,

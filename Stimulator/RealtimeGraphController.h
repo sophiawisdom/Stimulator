@@ -13,8 +13,6 @@
 
 @interface RealtimeGraphController : NSViewController<PolicyObserver, ParamsReceiver>
 
-@property Parameters *params;
-
 - (instancetype)initWithFrame:(NSRect)frame;
 
 @end

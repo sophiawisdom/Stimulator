@@ -45,14 +45,7 @@ static volatile int thread_num = 0;
         _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", thread_num++];
         _thread.qualityOfService = NSQualityOfServiceBackground;
-        _thread.stackSize = 0x19000; // small stack, we should only be going one or two layers deep of recursion.
         NSLog(@"Created thread, %@", _thread);
-        
-        /*
-        _last_flush = -1;
-        _total_flush_time = 0;
-        _num_flushes = 0;
-         */
     }
     return self;
 }
@@ -119,6 +112,11 @@ static volatile int thread_num = 0;
             [self flush_cache];
         }
     }
+}
+
+- (NSString *)description
+{
+    return _thread.name;
 }
 
 @end

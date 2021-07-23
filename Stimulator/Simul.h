@@ -7,6 +7,8 @@ struct simul;
 
 typedef PolicyResult (*PolicyFunc)(struct simul * test);
 
+//#define SPEED_CHECK 1
+
 typedef struct Parameters {
     int blocks_wide;
     int blocks_high;

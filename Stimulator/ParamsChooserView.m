@@ -72,7 +72,7 @@
         
         _blockHeight = [[NSSlider alloc] initWithFrame:NSMakeRect(20, 120, 100, 20)];
         _blockHeight.continuous = YES;
-        _blockHeight.minValue = 1;
+        _blockHeight.minValue = 5;
         _blockHeight.maxValue = 100; // We don't need tickmarks because the number is so high, we'll just cast to integer when it's changed.
         _blockHeight.target = self;
         _blockHeight.action = @selector(blockHeightChanged);
@@ -85,7 +85,7 @@
         
         _blockWidth = [[NSSlider alloc] initWithFrame:NSMakeRect(20, 170, 100, 20)];
         _blockWidth.continuous = YES;
-        _blockWidth.minValue = 1;
+        _blockWidth.minValue = 5;
         _blockWidth.maxValue = 100; // We don't need tickmarks because the number is so high, we'll just cast to integer when it's changed.
         _blockWidth.target = self;
         _blockWidth.action = @selector(blockWidthChanged);
@@ -134,9 +134,9 @@
 }
 
 - (void)update_params {
-    Parameters *new_params = calloc(sizeof(Parameters), 1);
-    memcpy(new_params, &_params, sizeof(Parameters));
-    _delegate.params = new_params;
+    // PARAMETERS * CANNOT SIMPLY BE MEMCPY()D BECAUSE MIN_TIME AND MAX_TIME HAVE TO BE UPDATED WHEN
+    // THINGS CHANGE
+    [_delegate setParams:create_parameters(_params.blocks_wide, _params.blocks_high, _params.block_height, _params.block_width, _params.stoplight_time, _params.street_width, _params.policy)];
 }
 
 - (void)streetWidthChanged {
@@ -170,6 +170,7 @@
 - (void)blocksHighChanged {
     if (_params.blocks_high != [_blocksHigh intValue]) {
         _params.blocks_high = [_blocksHigh intValue];
+        printf("set blocks_high to %d\n", _params.blocks_high);
         [self update_params];
     }
 }
@@ -177,6 +178,7 @@
 - (void)blocksWideChanged {
     if (_params.blocks_wide != [_blocksWide intValue]) {
         _params.blocks_wide = [_blocksWide intValue];
+        printf("set blocks_wide to %d\n", _params.blocks_wide);
         [self update_params];
     }
 }
