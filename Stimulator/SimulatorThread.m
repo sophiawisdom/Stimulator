@@ -20,7 +20,7 @@ static const int cache_size = 500;
 @implementation SimulatorThread {
     NSThread *_thread;
     mach_port_t _thread_port;
-    Parameters *_params;
+    ParametersObject *_params;
     Results *_results;
     int *_results_cache;
     int _cache_used;
@@ -50,7 +50,7 @@ static volatile int thread_num = 0;
     return self;
 }
 
-- (void)newParams:(Parameters *)params andResults: (Results *)results { // main thread
+- (void)newParams:(ParametersObject *)params andResults: (Results *)results { // main thread
     self.dirty = true;
     _params = params;
     _results = results;
@@ -99,13 +99,13 @@ static volatile int thread_num = 0;
 - (void)simulate { // on _thread's thread
     _thread_port = mach_thread_self();
     while (1) {
-        if (self.dirty) { // this line takes ~1/1000th of the overall time
+        if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             memset(_results_cache, 0, cache_size);
             _cache_used = 0;
             self.dirty = false;
         }
 
-        struct diagnostics result = simulate(_params);
+        struct diagnostics result = simulate(_params -> _params);
 
         _results_cache[_cache_used++] = result.total_time * RESULTS_SPECIFICITY_MULTIPLIER;
         if (_cache_used == cache_size) {

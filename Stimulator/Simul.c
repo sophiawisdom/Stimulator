@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include "Simul.h"
-
+ 
 // How long is the stoplight's cycle time
 double get_stoplight_time(struct simul *simulation, int x, int y) {
     // Instead of pre-calculating the stoplight times, we load them dynamically
@@ -27,15 +27,15 @@ double stoplight_wait(struct simul *simulation, PolicyResult direction) {
     printf("effective_x is %d, effective_y is %d\n", effective_x, effective_y);
 #endif
     
-    // get_stoplight_time returns its cycle time, which is evenly split between top and right. Starts top then goes right.
+    // The whole system cycles every s_t*2 seconds. get_stoplight_time returns when "top" switches to "right", which can be from .5-1.5*s_t
     double stoplight_time = get_stoplight_time(simulation, effective_x, effective_y);
-    double twice_stoplight_time = stoplight_time*2;
-    float current_time = fmodf(simulation -> cur_t, twice_stoplight_time);
+    float cycle_time = simulation -> twice_stoplight_time;
+    float current_time = fmodf(simulation -> cur_t, cycle_time);
     if (direction == Top) {
         if (current_time <= stoplight_time) { // Green light to go Top
             return 0;
         } else {
-            return (twice_stoplight_time - current_time);
+            return cycle_time - current_time;
         }
     } else if (direction == Right) {
         if (current_time < stoplight_time) {
@@ -63,7 +63,6 @@ bool step_simul(struct simul *simulation) {
 #endif
         if (simulation -> x_right) { // we're at the right, so if we go right now we're crossing the street
             double wait_time = stoplight_wait(simulation, response);
-            simulation -> diag.time_waiting += wait_time;
             simulation -> cur_t += simulation->params.street_width + wait_time;
             simulation -> x_right = false;
             simulation -> current_x += 1;
@@ -77,7 +76,6 @@ bool step_simul(struct simul *simulation) {
 #endif
         if (simulation -> y_top) { // we're at the top, so we're crossing the street here
             double wait_time = stoplight_wait(simulation, response);
-            simulation -> diag.time_waiting += wait_time;
             simulation -> cur_t += simulation->params.street_width + wait_time;
             simulation -> y_top = false;
             simulation -> current_y += 1;
@@ -93,7 +91,6 @@ bool step_simul(struct simul *simulation) {
     if (response == Top) {
         // simulation -> diag.move_sequence[simulation -> diag.cur_move /8] |= 1 << (simulation -> diag.cur_move % 8);
     }
-    simulation -> diag.cur_move += 1;
 
     if ((simulation -> current_x + 1) == simulation -> params.blocks_wide &&
         (simulation -> current_y + 1) == simulation -> params.blocks_high &&
@@ -136,12 +133,12 @@ PolicyResult avoid_waiting_policy_2(struct simul *simulation) {
     else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
         return Top;
     }
-    
+
     if (!simulation -> x_right && !simulation -> y_top) {
         // We're at the bottom-left, which means there's no stoplight to look at in any case, so just go top as a default.
         return Top;
     }
-    
+
     if (simulation -> x_right && !simulation -> y_top) {
         // We're at the bottom-right. We should try to go right if there's no wait, but otherwise we'll go top.
         if (stoplight_wait(simulation, Right) == 0) {
@@ -149,7 +146,7 @@ PolicyResult avoid_waiting_policy_2(struct simul *simulation) {
         }
         return Top;
     }
-    
+
     if (!simulation -> x_right && simulation -> y_top) {
         // We're at the top-left, so same as bottom-right but reversed.
         if (stoplight_wait(simulation, Top) == 0) {
@@ -157,7 +154,7 @@ PolicyResult avoid_waiting_policy_2(struct simul *simulation) {
         }
         return Right;
     }
-    
+
     // If we're at the top-right, just go whichever way doesn't have a wait.
     if (stoplight_wait(simulation, Top) == 0) {
         return Top;
@@ -175,7 +172,7 @@ PolicyResult faster_policy(struct simul *simulation) {
     else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
         return Top;
     }
-    
+
     // how "steep" is the way we're trying to go?
     double grade = ((double) simulation -> params.blocks_wide) / ((double) simulation -> params.blocks_high);
     double diagonal_current_y = grade * simulation -> current_x;
@@ -184,7 +181,7 @@ PolicyResult faster_policy(struct simul *simulation) {
     // Right.
 
     double top_stoplight_time = stoplight_wait(simulation, Top);
-    
+
     if (blocks_off_diagonal > 5) { // Want to go top if feasible
         // 20 blocks off, tolerate up to 4s. 10 blocks off, tolerate up to 2s, etc.
         if (top_stoplight_time < blocks_off_diagonal/5) {
@@ -221,14 +218,14 @@ PolicyResult faster_policy_2(struct simul *simulation) {
     else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
         return Top;
     }
-    
+
     // how "steep" is the way we're trying to go?
     double grade = ((double) simulation -> params.blocks_wide) / ((double) simulation -> params.blocks_high);
     double diagonal_current_y = grade * simulation -> current_x;
     double blocks_off_diagonal = diagonal_current_y - simulation -> current_y;
     // if this is positive, it means we're below where we need to be -- we should prioritize Top. If it's negative, we should prioritize
     // Right.
-    
+
     // We're at the bottom-left. Go whichever way is closer to diagonal.
     if (!simulation -> y_top && !simulation -> x_right) {
         if (blocks_off_diagonal > 0) {
@@ -237,9 +234,9 @@ PolicyResult faster_policy_2(struct simul *simulation) {
             return Right;
         }
     }
-    
+
     double top_stoplight_time = stoplight_wait(simulation, Top);
-    
+
     // We're at the top-left. Always go top if it's no wait, and take the wait to go top if we want to go that way and the light isn't too long. otherwise go right.
     if (simulation -> y_top && !simulation -> x_right) {
         if (top_stoplight_time == 0) { // if it's a free street just go.
@@ -299,20 +296,16 @@ PolicyResult faster_policy_2(struct simul *simulation) {
     }
 }
 
-struct diagnostics simulate(Parameters *params) {
+struct diagnostics simulate(Parameters params) {
     struct simul *simulation = malloc(sizeof(struct simul));
 
     simulation -> cur_t = 0;
     simulation -> current_x = 0;
     simulation -> current_y = 0;
-
-    simulation -> diag.num_randoms = 0;
     
-    simulation -> params = *params;
+    simulation -> params = params;
 
     // diagnostics...
-    simulation -> diag.cur_move = 0;
-    simulation -> diag.time_waiting = 0;
 
     simulation -> x_right = false;
     simulation -> y_top = false;
@@ -321,7 +314,7 @@ struct diagnostics simulate(Parameters *params) {
     simulation -> half_stoplight_time = simulation->params.stoplight_time/2;
     simulation -> twice_stoplight_time = simulation->params.stoplight_time*2;
     
-    if (simulation -> params.blocks_wide > 1000 || simulation -> params.blocks_high > 1000) {
+    if (abs(simulation -> params.blocks_wide) > 1000 || abs(simulation -> params.blocks_high > 1000)) {
         printf("GOT WEIRD PARAMETERS: %d %d\n", simulation -> params.blocks_wide, simulation -> params.blocks_high);
     }
     int area = (simulation -> params.blocks_wide+1) * (simulation -> params.blocks_high+1);
@@ -344,26 +337,6 @@ struct diagnostics simulate(Parameters *params) {
     free(simulation);
 
     return diag;
-}
-
-Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy) {
-    Parameters *params = calloc(sizeof(Parameters), 1);
-    params -> blocks_wide = blocksWide;
-    params -> blocks_high = blocksHigh;
-    params -> block_height = blockHeight;
-    params -> block_width = blockWidth;
-    params -> stoplight_time = stoplightTime;
-    params -> street_width = streetWidth;
-    params -> policy = policy;
-    
-    // extra 5 here is for safety. i know this is dumb
-    params -> min_time = blocksWide*blockWidth + blocksHigh*blockHeight + streetWidth*(blocksHigh-1+blocksWide-1) - 5;
-    params -> max_time = params -> min_time + stoplightTime*2*(blocksHigh+blocksWide) + 10;
-    return params;
-}
-
-bool parameters_equal(Parameters *restrict first, Parameters *restrict second) {
-    return memcmp(first, second, sizeof(Parameters)) == 0;
 }
 
 /*

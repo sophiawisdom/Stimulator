@@ -10,7 +10,7 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 
-#include "Simul.h"
+#include "ParametersObject.h"
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
 #import "PolicyCompiler.h"
@@ -25,7 +25,7 @@ static const unsigned int num_threads = 4;
     MTKView *_view;
     RealtimeGraphRenderer *_distribution_renderer;
     PolicyCompiler *_policycompiler;
-    Parameters *_params;
+    ParametersObject *_params;
     PolicyFunc _compiled_policy;
 }
 
@@ -66,26 +66,17 @@ static const unsigned int num_threads = 4;
     for (int i = 0; i < num_threads; i++) {
         [_threadpool addObject:[[SimulatorThread alloc] init]];
     }
-    self.params = create_parameters(50, 50, 30, 30, 10.0, 2, default_policy);
+    self.params = [ParametersObject defaultParams];
     // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
 }
 
-- (void)dealloc
-{
-    free(_params);
-}
-
-- (void)setParams:(Parameters *)params {
-    Parameters *old_params = _params;
+- (void)setParams:(ParametersObject *)params {
     _params = params;
-    _results = [[Results alloc] initWithMin:_params -> min_time Max:_params -> max_time MaxWriters:num_threads];
+    _results = [[Results alloc] initWithMin:_params -> _params.min_time Max:_params -> _params.max_time MaxWriters:num_threads];
     [_threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
         [thread newParams:_params andResults:_results];
     }];
     [_distribution_renderer setParams:_params andResults:_results];
-    if (old_params != params) { // This is why I probably should have kept Parameters as an object...
-        free(old_params);
-    }
 }
 
 @end

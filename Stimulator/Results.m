@@ -78,6 +78,10 @@
     // that would suck. Right now it isn't a big problem, but ideally we could do this userside.
     int adjusted_min = _min*RESULTS_SPECIFICITY_MULTIPLIER;
     for (int i = 0; i < count; i++) {
+        if (values[i] > (_max*RESULTS_SPECIFICITY_MULTIPLIER)) {
+            printf("GOT INVALID VALUE %d > max %d\n", values[i]/RESULTS_SPECIFICITY_MULTIPLIER, _max);
+            exit(1);
+        }
         _results[values[i]-adjusted_min] += 1;
     }
 

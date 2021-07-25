@@ -5,7 +5,7 @@ typedef enum PolicyResult {
 
 struct simul;
 
-typedef PolicyResult (*PolicyFunc)(struct simul * test);
+typedef PolicyResult (*PolicyFunc)(struct simul * current_state);
 
 //#define SPEED_CHECK 1
 
@@ -23,11 +23,7 @@ typedef struct Parameters {
 } Parameters;
 
 struct diagnostics {
-    int time_waiting;
     double total_time;
-    // char move_sequence[128]; // stored as an *inline* sequence of bools. this means max width+height is 1024
-    int cur_move;
-    int num_randoms;
 };
 
 struct simul {
@@ -53,7 +49,7 @@ struct simul {
     double half_stoplight_time;
 };
 
-struct diagnostics simulate(Parameters *params);
+struct diagnostics simulate(Parameters params);
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
 PolicyResult avoid_waiting_policy_2(struct simul *simulation);
@@ -75,9 +71,10 @@ static const PolicyFunction policies[5] = {
     {.policy = default_policy, .name="default policy"}
 };
 
-Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
-bool parameters_equal(Parameters *first, Parameters *second);
+// Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);
+// bool parameters_equal(Parameters *first, Parameters *second);
 // create_parameters(50, 50, 30, 30, 10.0, 2, default_policy)
+
 const static Parameters default_params = {
     .blocks_wide = 50,
     .blocks_high = 50,

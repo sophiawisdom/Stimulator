@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <MetalKit/MetalKit.h>
 
-#import "Simul.h"
+#import "ParametersObject.h"
 #import "Results.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMTKView: (MTKView *)view;
 
-- (void)setParams: (Parameters *)params andResults: (Results *)results;
+- (void)setParams: (ParametersObject *)params andResults: (Results *)results;
 
 @end
 

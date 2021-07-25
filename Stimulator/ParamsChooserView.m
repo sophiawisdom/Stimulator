@@ -134,9 +134,7 @@
 }
 
 - (void)update_params {
-    // PARAMETERS * CANNOT SIMPLY BE MEMCPY()D BECAUSE MIN_TIME AND MAX_TIME HAVE TO BE UPDATED WHEN
-    // THINGS CHANGE
-    [_delegate setParams:create_parameters(_params.blocks_wide, _params.blocks_high, _params.block_height, _params.block_width, _params.stoplight_time, _params.street_width, _params.policy)];
+    [_delegate setParams:[[ParametersObject alloc] initWithBlocksWide:_params.blocks_wide blocksHigh:_params.blocks_high blockHeight:_params.block_height blockWidth:_params.block_width stoplightTime:_params.stoplight_time streetWidth:_params.street_width policy:_params.policy]];
 }
 
 - (void)streetWidthChanged {
@@ -170,7 +168,7 @@
 - (void)blocksHighChanged {
     if (_params.blocks_high != [_blocksHigh intValue]) {
         _params.blocks_high = [_blocksHigh intValue];
-        printf("set blocks_high to %d\n", _params.blocks_high);
+        // printf("set blocks_high to %d\n", _params.blocks_high);
         [self update_params];
     }
 }
@@ -178,7 +176,7 @@
 - (void)blocksWideChanged {
     if (_params.blocks_wide != [_blocksWide intValue]) {
         _params.blocks_wide = [_blocksWide intValue];
-        printf("set blocks_wide to %d\n", _params.blocks_wide);
+        // printf("set blocks_wide to %d\n", _params.blocks_wide);
         [self update_params];
     }
 }

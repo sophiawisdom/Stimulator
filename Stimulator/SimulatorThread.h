@@ -8,17 +8,17 @@
 
 #import <Foundation/Foundation.h>
 #import "Results.h"
-#import "Simul.h"
+#import "ParametersObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-static const int max_results = 100000 * 1000; // max number of simulations we should do before we stop.
+static const long max_results = 100000000000 * 1000; // max number of simulations we should do before we stop.
 
 @interface SimulatorThread : NSObject
 
 - (instancetype)init;
 
-- (void)newParams:(Parameters *)params andResults: (Results *)results;
+- (void)newParams:(ParametersObject *)params andResults: (Results *)results;
 
 - (void)pause;
 - (void)unpause;

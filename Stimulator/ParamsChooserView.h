@@ -8,13 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import "PolicyChooserView.h"
-#import "Simul.h"
+#import "ParametersObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ParamsReceiver <NSObject>
 
-- (void)setParams: (Parameters *)params;
+- (void)setParams: (ParametersObject *)params;
 
 @end
 

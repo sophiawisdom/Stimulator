@@ -24,7 +24,7 @@
     id<MTLRenderPipelineState> _meanLinePipeline;
     CGSize _viewportSize;
     Results *_results;
-    Parameters *_params;
+    ParametersObject *_params;
     
     // We use SceneKit for rendering text because the quantity of text we have to render is minimal, and doing text rendering on the GPU
     // seems quite difficult.
@@ -113,7 +113,7 @@
     return self;
 }
 
-- (void)setParams: (Parameters *)params andResults: (Results *)results {
+- (void)setParams: (ParametersObject *)params andResults: (Results *)results {
     // MAIN THREAD ONLY
     _params = params;
     _results = results;
@@ -124,7 +124,7 @@
 - (int)num_boxes {
     int max_screen_boxes = _viewportSize.width * graph_width/3;
     int max_vertex_boxes = 1000; // boxes array must be < 4096 bytes, so max 1000 integers.
-    int max_range_boxes = RESULTS_SPECIFICITY_MULTIPLIER*(_params->max_time - _params->min_time);
+    int max_range_boxes = RESULTS_SPECIFICITY_MULTIPLIER*(_params-> _params.max_time - _params->_params.min_time);
     return min(min(max_screen_boxes, max_vertex_boxes), max_range_boxes);
 }
 
@@ -211,8 +211,8 @@
     _textNode.text = [NSString stringWithFormat:@"%f%%", mean*100];
     _textNode.hidden = false;
 
-    _max_node.text = [NSString stringWithFormat:@"%d", _params -> max_time];
-    _min_node.text = [NSString stringWithFormat:@"%d", _params -> min_time];
+    _max_node.text = [NSString stringWithFormat:@"%d", _params -> _params.max_time];
+    _min_node.text = [NSString stringWithFormat:@"%d", _params -> _params.min_time];
     // _max_node.position = CGPointMake(mouseLocation.x*2-350, mouseLocation.y*2-300);
     // _min_node.position = CGPointMake(mouseLocation.x*2-250, mouseLocation.y*2-300);
 
