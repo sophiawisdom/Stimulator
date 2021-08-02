@@ -123,7 +123,7 @@
 
 - (int)num_boxes {
     int max_screen_boxes = _viewportSize.width * graph_width/3;
-    int max_vertex_boxes = 1000; // boxes array must be < 4096 bytes, so max 1000 integers.
+    int max_vertex_boxes = 1000; // boxes array must be < 4096 bytes to pass to the graph shader, so max 1000 integers.
     int max_range_boxes = RESULTS_SPECIFICITY_MULTIPLIER*(_params-> _params.max_time - _params->_params.min_time);
     return min(min(max_screen_boxes, max_vertex_boxes), max_range_boxes);
 }
@@ -202,8 +202,10 @@
     long long time = tv.tv_sec*1000*1000 + tv.tv_usec;
     long long diff = time - _results.beginning;
     double t_diff = diff/(1000000.0);
-    double time_taken = diff/(_results.num_results > 0 ? _results.num_results : 1);
+    /*
+    double time_taken = ((double)diff)/(_results.num_results > 0 ? _results.num_results : 1);
     printf("It's been %g seconds and there have been %lld results written (%g µs/results)\n", t_diff, _results.num_results, time_taken);
+     */
 #endif
 
     CGPoint mouseLocation = [NSEvent mouseLocation];

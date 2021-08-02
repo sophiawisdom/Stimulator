@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithMTKView: (MTKView *)view;
 
-- (void)setParams: (ParametersObject *)params andResults: (Results *)results;
+- (void)setParams: (ParametersObject *)params andResults:(Results *)results;
 
 @end
 

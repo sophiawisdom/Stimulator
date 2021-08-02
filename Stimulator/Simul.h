@@ -7,7 +7,7 @@ struct simul;
 
 typedef PolicyResult (*PolicyFunc)(struct simul * current_state);
 
-//#define SPEED_CHECK 1
+#define SPEED_CHECK 0
 
 typedef struct Parameters {
     int blocks_wide;

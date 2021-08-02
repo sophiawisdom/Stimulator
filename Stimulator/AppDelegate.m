@@ -10,14 +10,9 @@
 #import "RealtimeGraphController.h"
 #import <MetalKit/MetalKit.h>
 
-@interface AppDelegate ()
-
-@end
-
 @implementation AppDelegate {
     NSWindow *_window;
 }
-    // NSWindow *_window;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // NSWindowStyleMask mask = NSWindowStyleMaskMiniaturizable & NSWindowStyleMaskResizable & NSWindowStyleMaskClosable;

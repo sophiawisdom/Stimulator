@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ParametersObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,16 +15,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Results : NSObject
 
-- (instancetype)initWithMin:(int)min Max:(int)max MaxWriters: (int)max_writers;
+- (instancetype)initWithMaxWriters: (int)max_writers;
 
 // Used for determining speed of simulate() function
 #ifdef SPEED_CHECK
-@property (nonatomic, readonly) long long num_results; // approximate number of results, no guarantee on freshness
+// @property (nonatomic, readonly) long long num_results; // approximate number of results, no guarantee on freshness
 @property (nonatomic, readonly) long long beginning; // unix time µs at which this was created
 #endif
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock;
-- (long long)writeValues: (int *)values count:(int)count;
+
+- (void)setParams:(ParametersObject *)newParams;
 
 @end
 

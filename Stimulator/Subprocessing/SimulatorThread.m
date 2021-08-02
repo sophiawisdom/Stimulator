@@ -21,7 +21,7 @@ static const int cache_size = 500;
     NSThread *_thread;
     mach_port_t _thread_port;
     ParametersObject *_params;
-    Results *_results;
+    SubprocessorResults *_results;
     int *_results_cache;
     int _cache_used;
     dispatch_semaphore_t _sem;
@@ -35,13 +35,14 @@ static const int cache_size = 500;
 
 static volatile int thread_num = 0;
 
-- (instancetype)init
+- (instancetype)initWithResults: (Results *)results
 {
     if (self = [super init]) {
         printf("Starting simulatorthread\n");
         _results_cache = calloc(sizeof(float), cache_size);
         _cache_used = 0;
         _sem = dispatch_semaphore_create(1);
+        _results = results;
         _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", thread_num++];
         _thread.qualityOfService = NSQualityOfServiceBackground;
@@ -50,10 +51,10 @@ static volatile int thread_num = 0;
     return self;
 }
 
-- (void)newParams:(ParametersObject *)params andResults: (Results *)results { // main thread
+- (void)newParams:(ParametersObject *)params
+{
     self.dirty = true;
     _params = params;
-    _results = results;
 
     if (_thread_port) { // wake thread up if it's been suspended
         thread_resume(_thread_port);
@@ -85,7 +86,7 @@ static volatile int thread_num = 0;
 }
 
 - (void)flush_cache {
-    long long total_written = [_results writeValues:self->_results_cache count:_cache_used];
+    long long total_written = [_results writeValues:self->_results_cache count:_cache_used forParams:_params];
     _cache_used = 0;
     if (total_written == -1 || total_written > max_results) {
         // If we've already written enough, put the thread in hibernation until the parameters change.

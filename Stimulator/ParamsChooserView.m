@@ -11,7 +11,7 @@
 @implementation ParamsChooserView {
     id<ParamsReceiver> _delegate;
     Parameters _params;
-    
+
     NSSlider *_blocksHigh;
     NSSlider *_blocksWide;
     NSSlider *_blockHeight;
