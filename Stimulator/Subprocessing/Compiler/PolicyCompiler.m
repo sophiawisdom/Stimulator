@@ -7,7 +7,7 @@
 //
 
 #import "PolicyCompiler.h"
-#include "../libclang/Index.h"
+#include "../../libclang/Index.h"
 
 @implementation PolicyCompiler {
     id<PolicyObserver> _obj;

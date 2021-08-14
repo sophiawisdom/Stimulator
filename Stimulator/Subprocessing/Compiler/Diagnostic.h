@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "../libclang/Index.h"
+#import "../../libclang/Index.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

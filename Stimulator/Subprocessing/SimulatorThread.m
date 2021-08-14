@@ -25,6 +25,7 @@ static const int cache_size = 500;
     int *_results_cache;
     int _cache_used;
     dispatch_semaphore_t _sem;
+    int _thread_num;
     
     /*
     long _last_flush;
@@ -35,18 +36,18 @@ static const int cache_size = 500;
 
 static volatile int thread_num = 0;
 
-- (instancetype)initWithResults: (Results *)results
+- (instancetype)initWithResults: (SubprocessorResults *)results
 {
     if (self = [super init]) {
-        printf("Starting simulatorthread\n");
         _results_cache = calloc(sizeof(float), cache_size);
         _cache_used = 0;
         _sem = dispatch_semaphore_create(1);
         _results = results;
         _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
-        _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", thread_num++];
+        _thread_num = thread_num++;
+        _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", _thread_num];
         _thread.qualityOfService = NSQualityOfServiceBackground;
-        NSLog(@"Created thread, %@", _thread);
+        // NSLog(@"Created thread, %@", _thread);
     }
     return self;
 }
@@ -98,7 +99,9 @@ static volatile int thread_num = 0;
 }
 
 - (void)simulate { // on _thread's thread
-    _thread_port = mach_thread_self();
+    _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
+    struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
+    thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             memset(_results_cache, 0, cache_size);

@@ -11,6 +11,7 @@
 @implementation ParamsChooserView {
     id<ParamsReceiver> _delegate;
     Parameters _params;
+    NSString *_policy_name;
 
     NSSlider *_blocksHigh;
     NSSlider *_blocksWide;
@@ -123,6 +124,7 @@
         [self addSubview:_streetWidthLabel];
         
         _policyChooserView = [[PolicyChooserView alloc] initWithFrame:NSMakeRect(200, 20, 100, 300) andDelegate:self];
+        _policy_name = @"default_policy";
         [self addSubview:_policyChooserView];
 
         self.wantsLayer = YES;
@@ -134,7 +136,7 @@
 }
 
 - (void)update_params {
-    [_delegate setParams:[[ParametersObject alloc] initWithBlocksWide:_params.blocks_wide blocksHigh:_params.blocks_high blockHeight:_params.block_height blockWidth:_params.block_width stoplightTime:_params.stoplight_time streetWidth:_params.street_width policy:_params.policy]];
+    [_delegate setParams:[[ParametersObject alloc] initWithBlocksWide:_params.blocks_wide blocksHigh:_params.blocks_high blockHeight:_params.block_height blockWidth:_params.block_width stoplightTime:_params.stoplight_time streetWidth:_params.street_width policy:_params.policy] andFunction:_policy_name];
 }
 
 - (void)streetWidthChanged {
@@ -181,9 +183,9 @@
     }
 }
 
-- (void)policyChanged:(nonnull PolicyFunc)newPolicy {
-    if (_params.policy != newPolicy) {
-        _params.policy = newPolicy;
+- (void)policyChanged:(nonnull NSString *)newPolicy {
+    if (![_policy_name isEqualToString:newPolicy]) {
+        _policy_name = newPolicy;
         [self update_params];
     }
 }

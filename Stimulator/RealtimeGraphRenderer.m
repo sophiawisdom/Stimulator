@@ -144,16 +144,28 @@
 
 
 - (int *)boxes: (int)num_boxes {
-    __block int *box_range_values = calloc(sizeof(int), num_boxes);
-    // printf("num_boxes is %d\n", nu)
-
+    int *box_range_values = calloc(sizeof(int), num_boxes);
+    __block int sum = 0;
+    __block int size = 0;
+    
+    __block int *block_values = NULL;
+    
+    long c = clock();
+    __block long s;
+    // At default values this takes ~10-15µs, which is fine given our frame budget is ~16000µs
     [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
-        int length = (max-min)*RESULTS_SPECIFICITY_MULTIPLIER;
-        for (int i = 0; i < length; i++) {
-            int index = (i*num_boxes)/length;
-            box_range_values[index] += results[i];
-        }
+        s = clock();
+        size = (max-min) * RESULTS_SPECIFICITY_MULTIPLIER;
+        block_values = malloc(size*sizeof(int));
+        memcpy(block_values, results, size*sizeof(int));
     }];
+    
+    for (int i = 0; i < size; i++) {
+        int index = (i*num_boxes)/size;
+        box_range_values[index] += block_values[i];
+        sum += block_values[i];
+    }
+    free(block_values);
     
     /*
     for (int i = 0; i < num_boxes; i++) {
@@ -254,6 +266,8 @@
     [commandBuffer presentDrawable:drawable];
 
     [commandBuffer commit];
+    
+    free(box_values);
 }
 
 - (void)mtkView:(nonnull MTKView *)view drawableSizeWillChange:(CGSize)size {

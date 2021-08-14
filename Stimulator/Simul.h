@@ -63,12 +63,10 @@ typedef struct PolicyFunction {
 } PolicyFunction;
 
 // Showed in the UI from bottom to top
-static const PolicyFunction policies[5] = {
-    {.policy = faster_policy_2, .name="new faster policy"},
-    {.policy = faster_policy, .name="faster policy"},
-    {.policy = avoid_waiting_policy_2, .name="new avoid waiting policy"},
-    {.policy = avoid_waiting_policy, .name="avoid waiting policy"},
-    {.policy = default_policy, .name="default policy"}
+static const PolicyFunction policies[3] = {
+    {.policy = faster_policy, .name="faster_policy"},
+    {.policy = avoid_waiting_policy, .name="avoid_waiting_policy"},
+    {.policy = default_policy, .name="default_policy"}
 };
 
 // Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);

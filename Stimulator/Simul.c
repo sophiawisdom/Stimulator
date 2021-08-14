@@ -118,22 +118,6 @@ PolicyResult avoid_waiting_policy(struct simul *simulation) {
         return Top;
     }
 
-    if (stoplight_wait(simulation, Top) == 0) {
-        return Top;
-    } else {
-        return Right;
-    }
-}
-
-PolicyResult avoid_waiting_policy_2(struct simul *simulation) {
-    // If we've hit the edges, we have no more options, just continue towards the destination.
-    if (simulation -> current_y+1 == simulation -> params.blocks_high && simulation -> y_top) {
-        return Right;
-    }
-    else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
-        return Top;
-    }
-
     if (!simulation -> x_right && !simulation -> y_top) {
         // We're at the bottom-left, which means there's no stoplight to look at in any case, so just go top as a default.
         return Top;
@@ -165,52 +149,6 @@ PolicyResult avoid_waiting_policy_2(struct simul *simulation) {
 
 // If we're off course, off the ideal diagonal, start sacrificing a little waiting time to get closer to the diagonal.
 PolicyResult faster_policy(struct simul *simulation) {
-    // If we've hit the edges, we have no more options, just continue towards the destination.
-    if (simulation -> current_y+1 == simulation -> params.blocks_high && simulation -> y_top) {
-        return Right;
-    }
-    else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
-        return Top;
-    }
-
-    // how "steep" is the way we're trying to go?
-    double grade = ((double) simulation -> params.blocks_wide) / ((double) simulation -> params.blocks_high);
-    double diagonal_current_y = grade * simulation -> current_x;
-    double blocks_off_diagonal = diagonal_current_y - simulation -> current_y;
-    // if this is positive, it means we're below where we need to be -- we should prioritize Top. If it's negative, we should prioritize
-    // Right.
-
-    double top_stoplight_time = stoplight_wait(simulation, Top);
-
-    if (blocks_off_diagonal > 5) { // Want to go top if feasible
-        // 20 blocks off, tolerate up to 4s. 10 blocks off, tolerate up to 2s, etc.
-        if (top_stoplight_time < blocks_off_diagonal/5) {
-            return Top;
-        }
-        return Right;
-    }
-    if (blocks_off_diagonal < -5) { // Want to go right if feasible
-        if (top_stoplight_time > 0) { // if top_stoplight_time > 0, right_stoplight_time == 0, so we can just go. This is a perf optimization.
-            return Right;
-        }
-
-        double right_stoplight_time = stoplight_wait(simulation, Right);
-        // 20 blocks off, tolerate up to 4s. 10 blocks off, tolerate up to 2s, etc.
-        if (right_stoplight_time < fabs(blocks_off_diagonal)/5) {
-            return Right;
-        }
-        return Top;
-    }
-
-    // We're on track, so just go whichever way can be gone immediately.
-    if (top_stoplight_time == 0) {
-        return Top;
-    } else {
-        return Right;
-    }
-}
-
-PolicyResult faster_policy_2(struct simul *simulation) {
     // If we've hit the edges, we have no more options, just continue towards the destination.
     if (simulation -> current_y+1 == simulation -> params.blocks_high && simulation -> y_top) {
         return Right;

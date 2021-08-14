@@ -35,7 +35,6 @@
 
         NSTextField *_policiesLabel = [NSTextField labelWithString:@"Policies"];
         // [_policiesLabel setFont:[NSFont systemFontOfSize:15]];
-        printf("num_policies is %d, bigger is %d\n", num_policies, num_policies*40);
         _policiesLabel.frame = NSMakeRect(0, (num_policies*40), 200, 50);
         [self addSubview:_policiesLabel];
     }
@@ -48,14 +47,7 @@
 }
 
 - (void)buttonPressed: (NSButton *)buttonPressed {
-    for (int i = 0; i < sizeof(policies)/sizeof(PolicyFunction); i++) {
-        if ([buttonPressed.title isEqualToString:[NSString stringWithUTF8String:policies[i].name]]) {
-            [_delegate policyChanged:policies[i].policy];
-            return;
-        }
-    }
-    
-    NSLog(@"Unable to find policy for button %@ with title %@", buttonPressed, buttonPressed.title);
+    [_delegate policyChanged:buttonPressed.title];
 }
 
 @end

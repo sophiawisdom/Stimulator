@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SubprocessorResults : NSObject
 
-- (instancetype)initWithMaxWriters:(int)max_writers andBackingArray:(_Atomic int *)arr andArraySem:(semaphore_t)sem;
+- (instancetype)initWithNumThreads:(int)num_threads andBackingArray:(nonnull _Atomic(int) *)arr andManualSem:(shmem_semaphore *)semaphore;
 
 - (void)setParams:(ParametersObject *)params;
 

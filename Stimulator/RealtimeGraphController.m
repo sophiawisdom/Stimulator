@@ -16,8 +16,6 @@
 #import "PolicyCompiler.h"
 #import "ParamsChooserView.h"
 
-static const unsigned int num_threads = 4;
-
 @implementation RealtimeGraphController {
     NSRect _frame;
     NSMutableArray<SimulatorThread *> *_threadpool;
@@ -48,7 +46,7 @@ static const unsigned int num_threads = 4;
 
     ParamsChooserView *params_chooser = [[ParamsChooserView alloc] initWithFrame:NSMakeRect(500, 300, 500, 400) andDelegate:self];
     [self.view addSubview:params_chooser];
-    _results = [[Results alloc] initWithMaxWriters:4];
+    _results = [[Results alloc] initWithNumThreads:8];
 }
 
 - (void)viewDidLoad {
@@ -56,21 +54,18 @@ static const unsigned int num_threads = 4;
     srandomdev();
 
     _policycompiler = [[PolicyCompiler alloc] initWithObject:self];
-
-    _threadpool = [[NSMutableArray alloc] initWithCapacity:num_threads];
-    for (int i = 0; i < num_threads; i++) {
-        [_threadpool addObject:[[SimulatorThread alloc] init]];
-    }
-    self.params = [ParametersObject defaultParams];
+    printf("Setting initial default params\n");
+    [self setParams:[ParametersObject defaultParams] andFunction:@"default_policy"];
     // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
 }
 
-- (void)setParams:(ParametersObject *)params {
+- (void)setParams:(ParametersObject *)params andFunction:(nonnull NSString *)function {
     // TOTHINKABOUT: does setting params in distribution renderer here have the possibility of threading issues? my general assumption is that the distribution renderer is all UI code, as is the ParamsChooserView, and as such it'll always be on the main thread. Better make sure!
     if (![NSThread isMainThread]) {
         fprintf(stderr, "SETPARAMS CALLED ON NOT THE MAIN THREAD!!! stacktrace: %s", [[[NSThread callStackSymbols] description] UTF8String]);
     }
-    [_results setParams:params];
+    printf("sending params to set_params (function %s)\n", [function UTF8String]);
+    [_results setParams:params function:function];
     [_distribution_renderer setParams:params andResults:_results];
 }
 

@@ -12,6 +12,7 @@
 		653D844E26B7AFDB00C7D509 /* SubprocessorResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 653D844D26B7AFDB00C7D509 /* SubprocessorResults.m */; };
 		655FCF7A2637D8FD004981A4 /* Simul.c in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8112624BB8200ED7E15 /* Simul.c */; };
 		655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 655FCF712637D8FB004981A4 /* libsimul.a */; };
+		657CCE4A26C4C91800AC5F19 /* NSApplicationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 657CCE4926C4C91800AC5F19 /* NSApplicationTest.m */; };
 		658B6B9D2666DBE3007AB80F /* ParametersObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 658B6B9C2666DBE3007AB80F /* ParametersObject.m */; };
 		659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E12624BB6200ED7E15 /* AppDelegate.m */; };
 		659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC7E42624BB6200ED7E15 /* RealtimeGraphController.m */; };
@@ -78,6 +79,8 @@
 		653D844C26B7AFDB00C7D509 /* SubprocessorResults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubprocessorResults.h; sourceTree = "<group>"; };
 		653D844D26B7AFDB00C7D509 /* SubprocessorResults.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubprocessorResults.m; sourceTree = "<group>"; };
 		655FCF712637D8FB004981A4 /* libsimul.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsimul.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		657CCE4826C4C91800AC5F19 /* NSApplicationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSApplicationTest.h; sourceTree = "<group>"; };
+		657CCE4926C4C91800AC5F19 /* NSApplicationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSApplicationTest.m; sourceTree = "<group>"; };
 		657FAE3C26B51BDB0094FEF0 /* Stimulator.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = Stimulator.profdata; sourceTree = "<group>"; };
 		658B6B9B2666DBE3007AB80F /* ParametersObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParametersObject.h; sourceTree = "<group>"; };
 		658B6B9C2666DBE3007AB80F /* ParametersObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ParametersObject.m; sourceTree = "<group>"; };
@@ -156,6 +159,7 @@
 		653D844F26B7B04A00C7D509 /* Subprocessing */ = {
 			isa = PBXGroup;
 			children = (
+				65EA9FAF2648FF5E00FE6900 /* Compiler */,
 				653D844B26B79E7E00C7D509 /* Subprocessor.h */,
 				653D844926B79E6200C7D509 /* Subprocessor.m */,
 				653D844C26B7AFDB00C7D509 /* SubprocessorResults.h */,
@@ -207,6 +211,8 @@
 		659CC7DF2624BB6200ED7E15 /* Stimulator */ = {
 			isa = PBXGroup;
 			children = (
+				657CCE4826C4C91800AC5F19 /* NSApplicationTest.h */,
+				657CCE4926C4C91800AC5F19 /* NSApplicationTest.m */,
 				659CC7E02624BB6200ED7E15 /* AppDelegate.h */,
 				659CC7E12624BB6200ED7E15 /* AppDelegate.m */,
 				659CC7E32624BB6200ED7E15 /* RealtimeGraphController.h */,
@@ -222,7 +228,6 @@
 				659CC81926262E0F00ED7E15 /* Results.h */,
 				659CC81A26262E0F00ED7E15 /* Results.m */,
 				653D844F26B7B04A00C7D509 /* Subprocessing */,
-				65EA9FAF2648FF5E00FE6900 /* Compiler */,
 				659CC8102624BB8200ED7E15 /* Simul.h */,
 				659CC8112624BB8200ED7E15 /* Simul.c */,
 				658B6B9B2666DBE3007AB80F /* ParametersObject.h */,
@@ -420,6 +425,7 @@
 				65EA9FB22648FF6B00FE6900 /* Diagnostic.m in Sources */,
 				659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */,
 				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
+				657CCE4A26C4C91800AC5F19 /* NSApplicationTest.m in Sources */,
 				659CC7E22624BB6200ED7E15 /* AppDelegate.m in Sources */,
 				653D844A26B79E6200C7D509 /* Subprocessor.m in Sources */,
 				6501710E2661360A00761393 /* PolicyChooserView.m in Sources */,

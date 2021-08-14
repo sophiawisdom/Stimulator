@@ -11,9 +11,9 @@
 #import "Subprocessor.h"
 #import "RealtimeGraphController.h"
 #include <sys/time.h>
+#include <x86intrin.h>
 
 memory_object_size_t shared_results_size = max_array_size*sizeof(int)*RESULTS_SPECIFICITY_MULTIPLIER;
-memory_object_size_t shared_command_size = sizeof(Command);
 
 semaphore_t allocate_port(task_t child_task, semaphore_t sem) {
     int port_retval = 1;
@@ -26,15 +26,20 @@ semaphore_t allocate_port(task_t child_task, semaphore_t sem) {
 }
 
 @implementation Results {
-    int _max_writers;
+    int _num_threads;
     int _min;
     int _max;
-    semaphore_t _command_sem;
+
+    int _write_fd;
+    int _read_fd;
     semaphore_t _results_sem;
     mach_port_t _child_task;
     pid_t _child_pid;
-    Command _Atomic *_shared_command_buffer;
     int _Atomic *_shared_results;
+    shmem_semaphore *_semaphore;
+    
+    ParametersObject *_params;
+    NSString *_name;
 }
 
 #define MACH_CALL(kret) if (kret != 0) {\
@@ -42,111 +47,106 @@ printf("Mach call on line %d of file %s failed with error #%d \"%s\".\n", __LINE
 exit(1);\
 }
 
-- (instancetype)initWithMaxWriters: (int)max_writers {
+- (instancetype)initWithNumThreads: (int)num_threads {
     self = [super init];
     if (self) {
-        _max_writers = max_writers;
-        int fds[2] = {0, 0}; // read, write fds
-        pipe(fds);
+        _num_threads = num_threads;
+        int process_to_subprocess[2] = {0, 0}; // read, write
+        int subprocess_to_process[2] = {0, 0}; // read, write
+        pipe(process_to_subprocess);
+        pipe(subprocess_to_process);
+        
+        // Allocate a new block of memory
+        MACH_CALL(mach_vm_allocate(mach_task_self(), (mach_vm_address_t *)&_shared_results, shared_results_size+0x1000, true));
+        // And then mark it as VM_INHERIT_SHARE, which shares them with our subprocess when we fork.
+        MACH_CALL(vm_inherit(mach_task_self(), (mach_vm_address_t)_shared_results, shared_results_size, VM_INHERIT_SHARE));
+
+        _semaphore = (mach_vm_address_t)_shared_results + (mach_vm_address_t)shared_results_size;
+        _semaphore -> need_read = false;
+        _semaphore -> threads_writing = 0; // how many threads are writing
+
         printf("About to fork...\n");
         _child_pid = fork();
         if (_child_pid == 0) {
-            run_subprocess(fds[0], max_writers);
+            run_subprocess(process_to_subprocess[0], subprocess_to_process[1], num_threads, _shared_results, _semaphore);
         }
+        _write_fd = process_to_subprocess[1];
+        _read_fd = subprocess_to_process[0];
         printf("child PID is %d\n", _child_pid);
 
         MACH_CALL(task_for_pid(mach_task_self(), _child_pid, &_child_task));
-        MACH_CALL(semaphore_create(mach_task_self(), &_command_sem, SYNC_POLICY_FIFO, 0));
-        MACH_CALL(semaphore_create(mach_task_self(), &_results_sem, SYNC_POLICY_FIFO, max_writers));
-        
-        int remote_command_sem = allocate_port(_child_task, _command_sem);
+        MACH_CALL(semaphore_create(mach_task_self(), &_results_sem, SYNC_POLICY_FIFO, 0));
+        for (int i = 0; i < _num_threads; i++) {
+            semaphore_signal(_results_sem);
+        }
+
         int remote_results_sem = allocate_port(_child_task, _results_sem);
-        printf("Writing sems: %d and %d\n", remote_command_sem, remote_results_sem);
-        write(fds[1], &remote_command_sem, sizeof(remote_command_sem));
-        write(fds[1], &remote_results_sem, sizeof(remote_results_sem));
-
-        // This code is mostly taken from my "Tweaks" project. See https://github.com/sophiawisdom/tweaks/blob/master/injector_lib/TWEProcess.m for more discussion.
-        // We're allocating two arrays that will be shared between the subprocess and the main process:
-        // the command buffer and the shared results buffer. the command buffer is used to send information and commands, e.g. new code or new params, and is synchronized by the main semaphore.
-        mach_vm_address_t remoteResultsAddress = 0;
-        mach_vm_address_t remoteCommandAddress = 0;
-        MACH_CALL(mach_vm_allocate(_child_task, &remoteResultsAddress, shared_results_size, true));
-        MACH_CALL(mach_vm_allocate(_child_task, &remoteCommandAddress, shared_command_size, true));
-
-        // mach_vm_map takes memory handles (ports), not raw addresses, so we need to get
-        // a handle to the memory we just allocated.
-        mach_port_t shared_results_handle = MACH_PORT_NULL;
-        mach_port_t shared_command_handle = MACH_PORT_NULL;
-        MACH_CALL(mach_make_memory_entry_64(_child_task,
-                                  &shared_results_size,
-                                  remoteResultsAddress, // Memory we're getting a handle for
-                                  VM_PROT_READ | VM_PROT_WRITE,
-                                  &shared_results_handle,
-                                  MACH_PORT_NULL)); // parent entry - for submaps?
-        MACH_CALL(mach_make_memory_entry_64(_child_task,
-                                  &shared_command_size,
-                                  remoteCommandAddress,
-                                  VM_PROT_READ | VM_PROT_WRITE,
-                                  &shared_command_handle,
-                                  MACH_PORT_NULL));
-        
-        _shared_command_buffer = 0;
-        // https://flylib.com/books/en/3.126.1.89/1/ has some documentation on this
-        MACH_CALL(mach_vm_map(mach_task_self(),
-                    (mach_vm_address_t*)&_shared_results, // Address in this address space
-                    shared_results_size,
-                    0xfff, // Alignment bits - make it page aligned
-                    true, // Anywhere bit
-                    shared_results_handle,
-                    0,
-                    false, // not sure what this means
-                    VM_PROT_READ | VM_PROT_WRITE,
-                    VM_PROT_READ | VM_PROT_WRITE,
-                    VM_INHERIT_SHARE));
-        _shared_command_buffer = 0;
-        MACH_CALL(mach_vm_map(mach_task_self(),
-                    (mach_vm_address_t*)&_shared_command_buffer,
-                    shared_command_size,
-                    0xfff,
-                    true,
-                    shared_command_handle,
-                    0,
-                    false,
-                    VM_PROT_READ | VM_PROT_WRITE,
-                    VM_PROT_READ | VM_PROT_WRITE,
-                    VM_INHERIT_SHARE));
-        
-        write(fds[1], &remoteResultsAddress, sizeof(remoteResultsAddress));
-        write(fds[1], &remoteCommandAddress, sizeof(remoteCommandAddress));
+        printf("allocated port is %d\n", remote_results_sem);
+        write(_write_fd, &remote_results_sem, sizeof(remote_results_sem));
     }
     return self;
 }
 
-- (void)setParams:(ParametersObject *)newParams {
-    _min = newParams -> _params.min_time;
+- (Response)setParams:(ParametersObject *)newParams function:(nonnull NSString *)function {
+    /*
+    if ([newParams isEqual:_params] && [function isEqualToString:_name]) {
+        return NULL; // nothing to do
+    }
+     */
+    unsigned long function_length = [function lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+    if (function_length > MAX_NAME_LEN) {
+        Response resp = {
+            .response_type = Error
+        };
+        return resp;
+    }
+    _params = newParams;
+    _name = function;
     _max = newParams -> _params.max_time;
+    _min = newParams -> _params.min_time;
+
+    Command cmd = {
+        .type_thing = SetParams,
+        .params = {
+            .params = newParams -> _params,
+        }
+    };
+    memcpy(cmd.params.policy_name, [function UTF8String], function_length);
+    printf("writing new params to subprocess. Name is %s\n", [function UTF8String]);
+    write(_write_fd, &cmd, sizeof(cmd));
+    
+    Response resp;
+    read(_read_fd, &resp, sizeof(Response));
+    return resp;
 }
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {
+    /*
     // We acquire all the values on the semaphore to ensure there are no writers
     for (int i = 0; i < _max_writers; i++) {
         semaphore_wait(_results_sem);
     }
+     */
+    if (![NSThread isMainThread] || _semaphore -> need_read) {
+        fprintf(stderr, "READVALUES CAN ONLY BE ACCESSED ON MAIN THREAD\n");
+    }
+    _semaphore -> need_read = true;
+    while (_semaphore -> threads_writing != 0) {} // Busy wait
 
     readBlock(_shared_results, _min, _max);
 
-    for (int i = 0; i < _max_writers; i++) {
-        semaphore_signal(_results_sem);
-    }
+    _semaphore -> need_read = false;
+}
+
+- (int)size {
+    return (_max-_min) * RESULTS_SPECIFICITY_MULTIPLIER;
 }
 
 - (void)dealloc
 {
-    mach_vm_deallocate(_child_task, (mach_vm_address_t)_shared_command_buffer, shared_command_size);
     mach_vm_deallocate(_child_task, (mach_vm_address_t)_shared_results, shared_results_size);
-    semaphore_destroy(_child_task, _command_sem);
     semaphore_destroy(_child_task, _results_sem);
-    // To consider: does the next line accomplish the previous four? unclear... TODO: test this.
+    // To consider: does the next line accomplish the previous two? unclear... TODO: test this.
     kill(_child_pid, 9);
 }
 
