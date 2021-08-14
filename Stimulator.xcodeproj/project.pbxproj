@@ -23,10 +23,6 @@
 		659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 659CC820262660A800ED7E15 /* RealtimeGraphRenderer.m */; };
 		659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 659CC8232626B29000ED7E15 /* GraphShader.metal */; };
 		65D02E3B2663BB7D00DCC7D8 /* ParamsChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D02E3A2663BB7D00DCC7D8 /* ParamsChooserView.m */; };
-		65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA9FA72648E32F00FE6900 /* PolicyCompiler.m */; };
-		65EA9FAA2648EBE400FE6900 /* libclang.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
-		65EA9FAD2648ECE100FE6900 /* libclang.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 65EA9FA92648EBE400FE6900 /* libclang.dylib */; };
-		65EA9FB22648FF6B00FE6900 /* Diagnostic.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EA9FB12648FF6B00FE6900 /* Diagnostic.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,17 +51,6 @@
 			files = (
 			);
 			name = "Embed XPC Services";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		65EA9FAE2648ECE100FE6900 /* Embed Libraries */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				65EA9FAD2648ECE100FE6900 /* libclang.dylib in Embed Libraries */,
-			);
-			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -126,7 +111,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65EA9FAA2648EBE400FE6900 /* libclang.dylib in Frameworks */,
 				655FCF7C2637D90A004981A4 /* libsimul.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,7 +272,6 @@
 				659CC7D92624BB6200ED7E15 /* Sources */,
 				659CC7DA2624BB6200ED7E15 /* Frameworks */,
 				659CC7DB2624BB6200ED7E15 /* Resources */,
-				65EA9FAE2648ECE100FE6900 /* Embed Libraries */,
 				653D844526B79C2D00C7D509 /* Embed XPC Services */,
 			);
 			buildRules = (
@@ -422,7 +405,6 @@
 			files = (
 				659CC7E52624BB6200ED7E15 /* RealtimeGraphController.m in Sources */,
 				659CC7ED2624BB6400ED7E15 /* main.m in Sources */,
-				65EA9FB22648FF6B00FE6900 /* Diagnostic.m in Sources */,
 				659CC8242626B29000ED7E15 /* GraphShader.metal in Sources */,
 				659CC81826262C9300ED7E15 /* SimulatorThread.m in Sources */,
 				657CCE4A26C4C91800AC5F19 /* NSApplicationTest.m in Sources */,
@@ -432,7 +414,6 @@
 				65D02E3B2663BB7D00DCC7D8 /* ParamsChooserView.m in Sources */,
 				658B6B9D2666DBE3007AB80F /* ParametersObject.m in Sources */,
 				659CC81B26262E0F00ED7E15 /* Results.m in Sources */,
-				65EA9FA82648E32F00FE6900 /* PolicyCompiler.m in Sources */,
 				653D844E26B7AFDB00C7D509 /* SubprocessorResults.m in Sources */,
 				659CC821262660A800ED7E15 /* RealtimeGraphRenderer.m in Sources */,
 			);

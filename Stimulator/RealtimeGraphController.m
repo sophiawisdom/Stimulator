@@ -13,7 +13,6 @@
 #include "ParametersObject.h"
 #import "SimulatorThread.h"
 #import "RealtimeGraphRenderer.h"
-#import "PolicyCompiler.h"
 #import "ParamsChooserView.h"
 
 @implementation RealtimeGraphController {
@@ -22,7 +21,6 @@
     Results *_results;
     MTKView *_view;
     RealtimeGraphRenderer *_distribution_renderer;
-    PolicyCompiler *_policycompiler;
     PolicyFunc _compiled_policy;
 }
 
@@ -53,7 +51,6 @@
     [super viewDidLoad];
     srandomdev();
 
-    _policycompiler = [[PolicyCompiler alloc] initWithObject:self];
     printf("Setting initial default params\n");
     [self setParams:[ParametersObject defaultParams] andFunction:@"default_policy"];
     // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
