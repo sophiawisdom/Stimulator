@@ -123,7 +123,7 @@
         [self addSubview:_streetWidth];
         [self addSubview:_streetWidthLabel];
         
-        _policyChooserView = [[PolicyChooserView alloc] initWithFrame:NSMakeRect(200, 20, 100, 300) andDelegate:self];
+        _policyChooserView = [[PolicyChooserView alloc] initWithFrame:NSMakeRect(200, 20, 400, 300) andDelegate:self];
         _policy_name = @"default_policy";
         [self addSubview:_policyChooserView];
 

@@ -149,12 +149,9 @@
     __block int size = 0;
     
     __block int *block_values = NULL;
-    
-    long c = clock();
-    __block long s;
     // At default values this takes ~10-15µs, which is fine given our frame budget is ~16000µs
+    // This needs to be very fast.
     [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
-        s = clock();
         size = (max-min) * RESULTS_SPECIFICITY_MULTIPLIER;
         block_values = malloc(size*sizeof(int));
         memcpy(block_values, results, size*sizeof(int));

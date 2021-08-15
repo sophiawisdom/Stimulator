@@ -34,7 +34,6 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
     Command *read_buffer = calloc(1, MAX_BUFFER_SIZE);
     while (1) {
         ssize_t bytes_read = read(read_fd, read_buffer, MAX_BUFFER_SIZE);
-        printf("SUBPROCESS: Read %zd bytes\n", bytes_read);
         resp.response_type = OK;
 
         if (read_buffer -> type_thing == SetParams) {
@@ -45,7 +44,6 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
                 resp.response_type = Error;
                 sprintf(resp.error, "Could not find function named %s: %s\n", read_buffer -> params.policy_name, dlerror());
             } else {
-                printf("SUBPROCESS: set new params! function name is %s\n", read_buffer -> params.policy_name);
                 ParametersObject *newParams = [[ParametersObject alloc] initWithBlocksWide:params.blocks_wide blocksHigh:params.blocks_high blockHeight:params.block_height blockWidth:params.block_width stoplightTime:params.stoplight_time streetWidth:params.street_width policy:policy_func];
                 [results setParams:newParams];
                 [threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {

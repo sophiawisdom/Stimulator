@@ -24,14 +24,7 @@ static const int cache_size = 500;
     SubprocessorResults *_results;
     int *_results_cache;
     int _cache_used;
-    dispatch_semaphore_t _sem;
     int _thread_num;
-    
-    /*
-    long _last_flush;
-    long _total_flush_time;
-    long _num_flushes;
-     */
 }
 
 static volatile int thread_num = 0;
@@ -39,15 +32,13 @@ static volatile int thread_num = 0;
 - (instancetype)initWithResults: (SubprocessorResults *)results
 {
     if (self = [super init]) {
-        _results_cache = calloc(sizeof(float), cache_size);
+        _results_cache = calloc(sizeof(int), cache_size);
         _cache_used = 0;
-        _sem = dispatch_semaphore_create(1);
         _results = results;
-        _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread_num = thread_num++;
+        _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", _thread_num];
         _thread.qualityOfService = NSQualityOfServiceBackground;
-        // NSLog(@"Created thread, %@", _thread);
     }
     return self;
 }
@@ -63,21 +54,6 @@ static volatile int thread_num = 0;
     if (![_thread isExecuting]) {
         [_thread start];
     }
-}
-
-
-// TODO: FIX THIS. this is almost certainly subtly wrong.
-// One source of wrongness would be if we expected resumes and suspends to be balanced but 2 resumes
-// happened before a suspend, which would effectively waste a resume.
-// Another would be that [ newParams] overrides [ pause], which is sort of weird. Just generally,
-// pause and unpause *should* be their own mechanism, which doesn't have potentially weird interactions
-// with everything else.
-- (void)pause {
-    thread_suspend(_thread_port);
-}
-
-- (void)unpause {
-    thread_resume(_thread_port);
 }
 
 - (void)dealloc
@@ -104,7 +80,7 @@ static volatile int thread_num = 0;
     thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
-            memset(_results_cache, 0, cache_size);
+            // memset(_results_cache, 0, cache_size);
             _cache_used = 0;
             self.dirty = false;
         }

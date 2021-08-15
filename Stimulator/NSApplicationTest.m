@@ -25,12 +25,11 @@
             NSLog(@"%@ %@", self.mainWindow, self.keyWindow);
             self -> _thing = [[AppDelegate alloc] init];
             self.delegate = self -> _thing;
-            _window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, NSScreen.mainScreen.frame.size.width, NSScreen.mainScreen.frame.size.height) styleMask:NSWindowStyleMaskMiniaturizable&NSWindowStyleMaskResizable&NSWindowStyleMaskClosable backing:NSBackingStoreBuffered defer:false];
-            [_window makeKeyAndOrderFront:nil];
-            _window.title = @"Stimulation for the Mind";
+            self -> _window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, NSScreen.mainScreen.frame.size.width, NSScreen.mainScreen.frame.size.height) styleMask:NSWindowStyleMaskMiniaturizable&NSWindowStyleMaskResizable&NSWindowStyleMaskClosable backing:NSBackingStoreBuffered defer:false];
+            [self -> _window makeKeyAndOrderFront:nil];
+            self -> _window.title = @"Stimulation for the Mind";
             // _window.contentView = [[TestView alloc] init];
-            NSLog(@"birth window is %@", _window);
-            _window.contentViewController = [[RealtimeGraphController alloc] initWithFrame:_window.frame];
+            self -> _window.contentViewController = [[RealtimeGraphController alloc] initWithFrame:self -> _window.frame];
         });
     }
     return self;

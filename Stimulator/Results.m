@@ -112,7 +112,6 @@ exit(1);\
         }
     };
     memcpy(cmd.params.policy_name, [function UTF8String], function_length);
-    printf("writing new params to subprocess. Name is %s\n", [function UTF8String]);
     write(_write_fd, &cmd, sizeof(cmd));
     
     Response resp;
@@ -121,25 +120,16 @@ exit(1);\
 }
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {
-    /*
-    // We acquire all the values on the semaphore to ensure there are no writers
-    for (int i = 0; i < _max_writers; i++) {
-        semaphore_wait(_results_sem);
-    }
-     */
     if (![NSThread isMainThread] || _semaphore -> need_read) {
         fprintf(stderr, "READVALUES CAN ONLY BE ACCESSED ON MAIN THREAD\n");
+        return;
     }
     _semaphore -> need_read = true;
-    while (_semaphore -> threads_writing != 0) {} // Busy wait
+    while (_semaphore -> threads_writing) {} // Spin until no more threads are waiting. On average, this is <5µs. In extreme configurations, this could be a problem.
 
     readBlock(_shared_results, _min, _max);
 
     _semaphore -> need_read = false;
-}
-
-- (int)size {
-    return (_max-_min) * RESULTS_SPECIFICITY_MULTIPLIER;
 }
 
 - (void)dealloc

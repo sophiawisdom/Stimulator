@@ -24,8 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) long long beginning; // unix time µs at which this was created
 #endif
 
-@property (readonly) int size;
-
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock;
 
 - (Response)setParams:(ParametersObject *)newParams function:(NSString *)function;

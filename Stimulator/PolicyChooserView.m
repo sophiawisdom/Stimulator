@@ -37,6 +37,9 @@
         // [_policiesLabel setFont:[NSFont systemFontOfSize:15]];
         _policiesLabel.frame = NSMakeRect(0, (num_policies*40), 200, 50);
         [self addSubview:_policiesLabel];
+        
+        NSTextView *_blah = [[NSTextView alloc] initWithFrame:NSMakeRect(100, 0, 200, 50)];
+        [self addSubview:_blah];
     }
     return self;
 }

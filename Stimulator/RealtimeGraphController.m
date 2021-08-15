@@ -61,7 +61,6 @@
     if (![NSThread isMainThread]) {
         fprintf(stderr, "SETPARAMS CALLED ON NOT THE MAIN THREAD!!! stacktrace: %s", [[[NSThread callStackSymbols] description] UTF8String]);
     }
-    printf("sending params to set_params (function %s)\n", [function UTF8String]);
     [_results setParams:params function:function];
     [_distribution_renderer setParams:params andResults:_results];
 }
