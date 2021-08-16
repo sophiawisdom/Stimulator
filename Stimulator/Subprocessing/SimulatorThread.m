@@ -74,10 +74,12 @@ static volatile int thread_num = 0;
     }
 }
 
-- (void)simulate { // on _thread's thread
+- (void)simu
+// Don't know if this is actually working
+struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
+thread_policy_selate { // on _thread's thread
     _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
-    struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
-    thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
+    t(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             // memset(_results_cache, 0, cache_size);
@@ -88,7 +90,7 @@ static volatile int thread_num = 0;
         struct diagnostics result = simulate(_params -> _params);
 
         _results_cache[_cache_used++] = result.total_time * RESULTS_SPECIFICITY_MULTIPLIER;
-        if (_cache_used == cache_size) {
+        if (_cache_used >= cache_size) {
             [self flush_cache];
         }
     }

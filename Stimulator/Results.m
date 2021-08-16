@@ -83,6 +83,12 @@ exit(1);\
         int remote_results_sem = allocate_port(_child_task, _results_sem);
         printf("allocated port is %d\n", remote_results_sem);
         write(_write_fd, &remote_results_sem, sizeof(remote_results_sem));
+        
+        // In practice this means that this object will not be deallocated until the process dies.
+        // For the moment, that's fine.
+        atexit_b(^{
+            kill(self -> _child_pid, 9);
+        });
     }
     return self;
 }
@@ -93,6 +99,11 @@ exit(1);\
         return NULL; // nothing to do
     }
      */
+    if (![NSThread isMainThread]) {
+        fprintf(stderr, "called on not main thread!!! %s\n", [[[NSThread callStackSymbols] componentsJoinedByString:@", "] UTF8String]);
+        exit(1);
+    }
+
     unsigned long function_length = [function lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
     if (function_length > MAX_NAME_LEN) {
         Response resp = {
