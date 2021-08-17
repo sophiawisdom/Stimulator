@@ -74,12 +74,12 @@ static volatile int thread_num = 0;
     }
 }
 
-- (void)simu
-// Don't know if this is actually working
-struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
-thread_policy_selate { // on _thread's thread
+- (void)simulate { // on _thread's thread
     _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
-    t(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
+
+    // Don't know if this is actually working
+    struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
+    thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             // memset(_results_cache, 0, cache_size);

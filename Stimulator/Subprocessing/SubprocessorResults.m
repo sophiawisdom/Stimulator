@@ -16,10 +16,10 @@
     
     _Atomic bool _dirty;
     
-    int _min;
-    int _max;
+    _Atomic int _min;
+    _Atomic int _max;
+    _Atomic unsigned long long _params; // just used as a pointer to make sure it's the same _params.
     int _num_threads;
-    ParametersObject * _params; // just used as a pointer to make sure it's the same _params.
 }
 
 - (instancetype)initWithNumThreads:(int)num_threads andBackingArray:(nonnull _Atomic(int) *)arr andManualSem:(shmem_semaphore *)semaphore
@@ -37,7 +37,7 @@
     _dirty = true;
     while (_semaphore -> threads_writing) {}
     
-    _params = params;
+    _params = (unsigned long long)params;
     _min = params -> _params.min_time;
     _max = params -> _params.max_time;
     memset(_backing_arr, 0, max_array_size*RESULTS_SPECIFICITY_MULTIPLIER*sizeof(int));
