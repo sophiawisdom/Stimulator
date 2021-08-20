@@ -17,7 +17,6 @@
 
 @implementation RealtimeGraphController {
     NSRect _frame;
-    NSMutableArray<SimulatorThread *> *_threadpool;
     Results *_results;
     MTKView *_view;
     RealtimeGraphRenderer *_distribution_renderer;
@@ -44,7 +43,7 @@
 
     ParamsChooserView *params_chooser = [[ParamsChooserView alloc] initWithFrame:NSMakeRect(500, 300, 500, 400) andDelegate:self];
     [self.view addSubview:params_chooser];
-    _results = [[Results alloc] initWithNumThreads:8];
+    _results = [Results sharedResult];
 }
 
 - (void)viewDidLoad {

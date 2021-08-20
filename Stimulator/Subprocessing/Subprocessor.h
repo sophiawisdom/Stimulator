@@ -19,6 +19,11 @@ typedef enum CommandType {
     SendCode = 2, // Send code to be compiled. The response will be a function identifier you can use with SetParams in the future. TODO: should this automatically toggle the new function
 } CommandType;
 
+typedef enum FunctionType {
+    PolicyFunction = 0,
+    StoplightFunction = 1
+} FunctionType;
+
 // This is bad, ideally it wouldn't be a union and you could chose different types... fine for now though.
 typedef struct command {
     CommandType type_thing;
@@ -29,6 +34,7 @@ typedef struct command {
         } params;
         struct SendCodeParams {
             char code[MAX_CODE_LEN]; // for sending code with SendCode
+            
         } send_code_params;
     };
 } Command;

@@ -18,16 +18,15 @@
 {
     if (self = [super initWithFrame:frame]) {
         _delegate = delegate;
-        int num_policies = sizeof(policies)/sizeof(PolicyFunction);
+        int num_policies = sizeof(policies)/sizeof(char *);
         for (int i = 0; i < num_policies; i++) {
-            PolicyFunction policy_func = policies[i];
-            NSButton *button = [NSButton radioButtonWithTitle:[NSString stringWithUTF8String:policy_func.name] target:self action:@selector(buttonPressed:)];
+            NSButton *button = [NSButton radioButtonWithTitle:[NSString stringWithUTF8String:policies[i]] target:self action:@selector(buttonPressed:)];
             button.frame = NSMakeRect(0, i*40, 100, 30);
             [button setWantsLayer:YES];
             button.layer.backgroundColor = [NSColor colorWithCalibratedRed:0.87f green:0.22f blue:0.03f alpha:1].CGColor;
             button.layer.cornerRadius = 4;
             button.layer.masksToBounds = true;
-            if (policy_func.policy == default_policy) {
+            if (strcmp(policies[i], "default_policy") == 0) {
                 button.state = NSControlStateValueOn;
             }
             [self addSubview:button];

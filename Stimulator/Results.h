@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Results : NSObject
 
-- (instancetype)initWithNumThreads: (int)num_threads;
++ (instancetype)sharedResult;
 
 // Used for determining speed of simulate() function
 #ifdef SPEED_CHECK

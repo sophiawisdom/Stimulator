@@ -77,17 +77,27 @@ static volatile int thread_num = 0;
 - (void)simulate { // on _thread's thread
     _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
 
-    // Don't know if this is actually working
+    // Don't know if this is actually working. TODO: check if it works.
     struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
     thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
+    int min = _params -> _params.min_time;
+    int max = _params -> _params.max_time;
     while (1) {
         if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             // memset(_results_cache, 0, cache_size);
             _cache_used = 0;
             self.dirty = false;
+            min = _params -> _params.min_time;
+            max = _params -> _params.max_time;
         }
 
-        struct diagnostics result = simulate(_params -> _params);
+        Parameters params = _params -> _params;
+        struct diagnostics result = simulate(params);
+        
+        if (result.total_time < params.min_time || result.total_time > params.max_time) {
+            printf("ERROR IN SIMULATE: %g, %d, %d\n", result.total_time, params.min_time, params.max_time);
+            exit(1);
+        }
 
         _results_cache[_cache_used++] = result.total_time * RESULTS_SPECIFICITY_MULTIPLIER;
         if (_cache_used >= cache_size) {

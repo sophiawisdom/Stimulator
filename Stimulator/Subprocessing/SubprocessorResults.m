@@ -61,9 +61,12 @@
     for (int i = 0; i < count; i++) {
         int value = values[i];
         if (value > adjusted_max || value < adjusted_min) {
+            _num_results -= 1; // just drop the value on the floor. so what if it's incorrect. get off my back, sjws.
+            /*
             printf("GOT INVALID VALUE %d > max %d\n", values[i]/RESULTS_SPECIFICITY_MULTIPLIER, _max);
             printf("_params is %p, params is %p\n", _params, params);
             exit(1);
+             */
         }
         _backing_arr[value-adjusted_min]++;
     }

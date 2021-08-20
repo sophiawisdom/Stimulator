@@ -57,16 +57,11 @@ PolicyResult default_policy(struct simul *simulation);
 PolicyResult faster_policy(struct simul *simulation);
 PolicyResult faster_policy_2(struct simul *simulation);
 
-typedef struct PolicyFunction {
-    PolicyFunc policy;
-    char *name; // used for UI
-} PolicyFunction;
-
 // Showed in the UI from bottom to top
-static const PolicyFunction policies[3] = {
-    {.policy = faster_policy, .name="faster_policy"},
-    {.policy = avoid_waiting_policy, .name="avoid_waiting_policy"},
-    {.policy = default_policy, .name="default_policy"}
+static const char* policies[3] = {
+    "faster_policy",
+    "avoid_waiting_policy",
+    "default_policy"
 };
 
 // Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);

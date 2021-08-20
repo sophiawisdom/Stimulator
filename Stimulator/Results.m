@@ -47,6 +47,15 @@ printf("Mach call on line %d of file %s failed with error #%d \"%s\".\n", __LINE
 exit(1);\
 }
 
++ (instancetype)sharedResult {
+    static dispatch_once_t onceToken;
+    static Results *_result;
+    dispatch_once(&onceToken, ^{
+        _result = [[Results alloc] initWithNumThreads:8];
+    });
+    return _result;
+}
+
 - (instancetype)initWithNumThreads: (int)num_threads {
     self = [super init];
     if (self) {

@@ -54,6 +54,8 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
             exit(1);
         } else if (read_buffer -> type_thing == SendCode) {
             printf("SUBPROCESS: we were asked to SendCode, but this hasn't been implemented yet. doing nothing.\n");
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"clang";
         } else {
             printf("Got garbage response\n");
         }
