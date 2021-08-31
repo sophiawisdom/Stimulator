@@ -11,12 +11,6 @@
 
 static const int cache_size = 500;
 
-@interface SimulatorThread()
-
-@property (atomic) bool dirty;
-
-@end
-
 @implementation SimulatorThread {
     NSThread *_thread;
     mach_port_t _thread_port;
@@ -25,6 +19,8 @@ static const int cache_size = 500;
     int *_results_cache;
     int _cache_used;
     int _thread_num;
+    
+    _Atomic bool _dirty;
 }
 
 static volatile int thread_num = 0;
@@ -39,21 +35,25 @@ static volatile int thread_num = 0;
         _thread = [[NSThread alloc] initWithTarget:self selector:@selector(simulate) object:nil];
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", _thread_num];
         _thread.qualityOfService = NSQualityOfServiceBackground;
+        _dirty = false;
     }
     return self;
 }
 
 - (void)newParams:(ParametersObject *)params
 {
-    self.dirty = true;
-    _params = params;
-
-    if (_thread_port) { // wake thread up if it's been suspended
+    if (!_params) {
+        _params = params;
+        [_thread start];
+        return;
+    } else if (_thread_port) { // wake thread up if it's been suspended
         thread_resume(_thread_port);
     }
-    if (![_thread isExecuting]) {
-        [_thread start];
-    }
+
+    self -> _dirty = true;
+    while (self -> _dirty) {} // wait for simulation thread to see change, upon which time it will set _dirty to false
+    _params = params;
+    self -> _dirty = true; // we're done executing and the simulation thread can go
 }
 
 - (void)dealloc
@@ -113,12 +113,14 @@ fastrand InitFastRand()
     int min = _params -> _params.min_time;
     int max = _params -> _params.max_time;
     while (1) {
-        if (self.dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
+        if (self -> _dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
             // memset(_results_cache, 0, cache_size);
+            self -> _dirty = false;
+            while (!self -> _dirty) {}
             _cache_used = 0;
-            self.dirty = false;
             min = _params -> _params.min_time;
             max = _params -> _params.max_time;
+            self -> _dirty = false;
         }
 
         Parameters params = _params -> _params;

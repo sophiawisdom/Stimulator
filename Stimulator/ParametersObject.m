@@ -24,6 +24,8 @@
         _params.min_time = blocksWide*blockWidth + blocksHigh*blockHeight + streetWidth*(blocksHigh-1+blocksWide-1) - 5;
         _params.max_time = _params.min_time + stoplightTime*2*(blocksHigh+blocksWide) + 10;
         
+        _params.magic = 0xCAFEBEEF;
+        
         return self;
     }
     return nil;

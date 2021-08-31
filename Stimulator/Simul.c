@@ -294,8 +294,8 @@ double simulate(Parameters params) {
     simulation -> half_stoplight_time = simulation->params.stoplight_time/2;
     simulation -> twice_stoplight_time = simulation->params.stoplight_time*2;
     
-    if (abs(simulation -> params.blocks_wide) > 1000 || abs(simulation -> params.blocks_high > 1000)) {
-        printf("GOT WEIRD PARAMETERS: %d %d\n", simulation -> params.blocks_wide, simulation -> params.blocks_high);
+    if (simulation -> params.magic != 0xCAFEBEEF || abs(simulation -> params.blocks_wide) > 1000 || abs(simulation -> params.blocks_high > 1000)) {
+        printf("GOT WEIRD PARAMETERS: %p %d %d\n", simulation -> params.magic, simulation -> params.blocks_wide, simulation -> params.blocks_high);
     }
     int area = (simulation -> params.blocks_wide+1) * (simulation -> params.blocks_high+1);
     // int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up

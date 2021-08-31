@@ -23,6 +23,8 @@ typedef struct Parameters {
 
     int max_time;
     int min_time;
+    
+    long long magic; // detect corruption
 } Parameters;
 
 struct diagnostics {
