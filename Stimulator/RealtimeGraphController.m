@@ -32,7 +32,6 @@
 }
 
 - (void)loadView {
-    NSLog(@"RealtimeGraphController's loadView was called... parent frame is %@\n", NSStringFromRect(_frame));
     self.view = [[MTKView alloc] initWithFrame:_frame device:MTLCreateSystemDefaultDevice()];
     NSLog(@"MTKView's frame is %@\n", NSStringFromRect(self.view.frame));
     self.view.frame = _frame;

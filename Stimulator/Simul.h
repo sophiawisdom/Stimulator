@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
 typedef enum PolicyResult {
     Right, // go right, even if it means waiting
     Top, // go top, even if it means waiting.
@@ -26,8 +29,26 @@ struct diagnostics {
     double total_time;
 };
 
+typedef struct fastrand_t {
+    // MWC1616 data
+    
+    int a[4];
+    int b[4];
+    int mask[4];
+    int m1[4];
+    int m2[4];
+    
+    //
+    // Result (4 32-bit random numbers)
+    
+    int res[4];
+    unsigned char used;
+} fastrand;
+
+// per_thread fastrand so we don't have coherency issues
+extern __thread fastrand global_rand;
+
 struct simul {
-    struct diagnostics diag;
     Parameters params;
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
     
@@ -47,21 +68,24 @@ struct simul {
     double rand_quotient;
     double twice_stoplight_time;
     double half_stoplight_time;
+    
+    // purpose of having this here is to cache accessing the global_rand variable, because that
+    // takes a lookup.
+    fastrand *rand;
 };
 
-struct diagnostics simulate(Parameters params);
+double simulate(Parameters params);
 
 PolicyResult avoid_waiting_policy(struct simul *simulation);
-PolicyResult avoid_waiting_policy_2(struct simul *simulation);
 PolicyResult default_policy(struct simul *simulation);
 PolicyResult faster_policy(struct simul *simulation);
-PolicyResult faster_policy_2(struct simul *simulation);
 
 // Showed in the UI from bottom to top
-static const char* policies[3] = {
+static const char* policies[4] = {
     "faster_policy",
     "avoid_waiting_policy",
-    "default_policy"
+    "default_policy",
+    "wait_more_policy"
 };
 
 // Parameters *create_parameters(int blocksWide, int blocksHigh, float blockHeight, float blockWidth, float stoplightTime, float streetWidth, PolicyFunc policy);

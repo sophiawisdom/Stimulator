@@ -1,5 +1,5 @@
 //
-//  NSApplicationTest.h
+//  NSApplicationWeird.h
 //  Stimulator
 //
 //  Created by Sophia Wisdom on 8/11/21.
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSApplicationTest : NSApplication
+@interface NSApplicationWeird : NSApplication
 
 @end
 

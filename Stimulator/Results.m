@@ -40,6 +40,7 @@ semaphore_t allocate_port(task_t child_task, semaphore_t sem) {
     
     ParametersObject *_params;
     NSString *_name;
+    NSString *_code_directory;
 }
 
 #define MACH_CALL(kret) if (kret != 0) {\
@@ -66,18 +67,20 @@ exit(1);\
         pipe(subprocess_to_process);
         
         // Allocate a new block of memory
-        MACH_CALL(mach_vm_allocate(mach_task_self(), (mach_vm_address_t *)&_shared_results, shared_results_size+0x1000, true));
+        MACH_CALL(mach_vm_allocate(mach_task_self(), (mach_vm_address_t *)&_shared_results, shared_results_size+sizeof(shmem_semaphore), true));
         // And then mark it as VM_INHERIT_SHARE, which shares them with our subprocess when we fork.
         MACH_CALL(vm_inherit(mach_task_self(), (mach_vm_address_t)_shared_results, shared_results_size, VM_INHERIT_SHARE));
 
         _semaphore = (mach_vm_address_t)_shared_results + (mach_vm_address_t)shared_results_size;
         _semaphore -> need_read = false;
         _semaphore -> threads_writing = 0; // how many threads are writing
+        
+        _code_directory = NSTemporaryDirectory();
 
         printf("About to fork...\n");
         _child_pid = fork();
         if (_child_pid == 0) {
-            run_subprocess(process_to_subprocess[0], subprocess_to_process[1], num_threads, _shared_results, _semaphore);
+            run_subprocess(process_to_subprocess[0], subprocess_to_process[1], num_threads, _shared_results, _semaphore, _code_directory);
         }
         _write_fd = process_to_subprocess[1];
         _read_fd = subprocess_to_process[0];

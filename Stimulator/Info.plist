@@ -25,7 +25,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2021 Sophia Wisdom. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplicationTest</string>
+	<string>NSApplicationWeird</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<true/>
 	<key>NSSupportsSuddenTermination</key>

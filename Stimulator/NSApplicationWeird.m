@@ -1,16 +1,16 @@
 //
-//  NSApplicationTest.m
+//  NSApplicationWeird.m
 //  Stimulator
 //
 //  Created by Sophia Wisdom on 8/11/21.
 //  Copyright © 2021 Sophia Wisdom. All rights reserved.
 //
 
-#import "NSApplicationTest.h"
+#import "NSApplicationWeird.h"
 #import "AppDelegate.h"
 #import "RealtimeGraphController.h"
 
-@implementation NSApplicationTest {
+@implementation NSApplicationWeird {
     AppDelegate *_thing;
     NSWindow *_window;
 }

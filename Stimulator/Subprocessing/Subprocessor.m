@@ -12,7 +12,7 @@
 #import "Subprocessor.h"
 #import "SubprocessorResults.h"
 
-int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shared_results, shmem_semaphore *semaphore_count) {
+int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shared_results, shmem_semaphore *semaphore_count, NSString *code_dir) {
     printf("Trying to read from read_fd (%d)\n", read_fd);
 
     semaphore_t array_sem;
@@ -20,8 +20,6 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
     printf("array_sem is %d\n", array_sem);
 
     printf("SUBPROCESS: Read shared_results: %p\n", shared_results);
-
-    // usleep(1000*10); // 10ms
 
     SubprocessorResults *results = [[SubprocessorResults alloc] initWithNumThreads:num_threads andBackingArray:shared_results andManualSem:semaphore_count];
 
@@ -54,8 +52,10 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
             exit(1);
         } else if (read_buffer -> type_thing == SendCode) {
             printf("SUBPROCESS: we were asked to SendCode, but this hasn't been implemented yet. doing nothing.\n");
+            NSString *input_filename = [NSString stringWithFormat:@"%@%s.c", code_dir, read_buffer -> send_code_params.function_name];
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"clang";
+            task.arguments = @[input_filename, @"-Ofast", @"-ffast-math", @"-march=native", @"-shared"];
         } else {
             printf("Got garbage response\n");
         }

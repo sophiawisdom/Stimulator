@@ -12,12 +12,17 @@
 		<key>Subprocessor.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>2</integer>
 		</dict>
 		<key>simul.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>speed_test.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -48,6 +53,11 @@
 			<true/>
 		</dict>
 		<key>659CC7FD2624BB6400ED7E15</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>65E0047726D87DB8009A5AE5</key>
 		<dict>
 			<key>primary</key>
 			<true/>

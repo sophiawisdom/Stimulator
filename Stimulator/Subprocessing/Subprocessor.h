@@ -33,8 +33,12 @@ typedef struct command {
             char policy_name[MAX_NAME_LEN];
         } params;
         struct SendCodeParams {
+            // As stands can only send one function at a time. probably fine.
+            // The code sent here is expected to be *complete* and compilable on its own. The only
+            // thing the subprocess knows about this code is the name by which it can be referenced.
             char code[MAX_CODE_LEN]; // for sending code with SendCode
-            
+            char function_name[MAX_NAME_LEN];
+            FunctionType type;
         } send_code_params;
     };
 } Command;
@@ -60,4 +64,4 @@ typedef struct shmem_semaphore {
 
 #define MAX_BUFFER_SIZE (sizeof(Command) > sizeof(Response) ? sizeof(Command) : sizeof(Response))
 
-int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shared_results, shmem_semaphore *semaphore_count);
+int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shared_results, shmem_semaphore *semaphore_count, NSString *code_dir);

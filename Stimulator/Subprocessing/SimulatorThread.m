@@ -74,8 +74,38 @@ static volatile int thread_num = 0;
     }
 }
 
+fastrand InitFastRand()
+{
+    // Initialize MWC1616 masks and multipliers
+    // Default values of 18000 and 30903 used
+    // for multipliers
+    
+    fastrand f;
+    
+    uint8_t i;
+    
+    for(i=0;i<4;i++) {
+        f.mask[i]=0xFFFF;
+        f.m1[i]=0x4650;
+        f.m2[i]=0x78B7;
+    }
+    
+    f.a[0] = random();
+    f.a[1] = random();
+    f.a[2] = random();
+    f.a[3] = random();
+    f.b[0] = random();
+    f.b[1] = random();
+    f.b[2] = random();
+    f.b[3] = random();
+    f.used = 0;
+    return f;
+}
+
 - (void)simulate { // on _thread's thread
     _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
+    
+    global_rand = InitFastRand();
 
     // Don't know if this is actually working. TODO: check if it works.
     struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
@@ -92,14 +122,14 @@ static volatile int thread_num = 0;
         }
 
         Parameters params = _params -> _params;
-        struct diagnostics result = simulate(params);
-        
-        if (result.total_time < params.min_time || result.total_time > params.max_time) {
-            printf("ERROR IN SIMULATE: %g, %d, %d\n", result.total_time, params.min_time, params.max_time);
+        double result = simulate(params);
+
+        if (result < params.min_time || result > params.max_time) {
+            printf("ERROR IN SIMULATE: %g, %d, %d\n", result, params.min_time, params.max_time);
             exit(1);
         }
 
-        _results_cache[_cache_used++] = result.total_time * RESULTS_SPECIFICITY_MULTIPLIER;
+        _results_cache[_cache_used++] = result * RESULTS_SPECIFICITY_MULTIPLIER;
         if (_cache_used >= cache_size) {
             [self flush_cache];
         }
