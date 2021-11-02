@@ -50,17 +50,21 @@
     srandomdev();
 
     printf("Setting initial default params\n");
-    [self setParams:[ParametersObject defaultParams] andFunction:@"default_policy"];
+    [self setParams:[ParametersObject defaultParams]];
     // printf("self params min_time is %d max_time is %d\n", _params -> min_time, _params -> max_time);
 }
 
-- (void)setParams:(ParametersObject *)params andFunction:(nonnull NSString *)function {
+- (void)setParams:(ParametersObject *)params {
     // TOTHINKABOUT: does setting params in distribution renderer here have the possibility of threading issues? my general assumption is that the distribution renderer is all UI code, as is the ParamsChooserView, and as such it'll always be on the main thread. Better make sure!
     if (![NSThread isMainThread]) {
         fprintf(stderr, "SETPARAMS CALLED ON NOT THE MAIN THREAD!!! stacktrace: %s", [[[NSThread callStackSymbols] description] UTF8String]);
     }
-    [_results setParams:params function:function];
+    [_results setParams:params];
     [_distribution_renderer setParams:params andResults:_results];
+}
+
+- (void)addPolicy:(NSString *)policy withCode:(NSString *)code {
+    [_results addPolicy:policy withCode:code];
 }
 
 @end

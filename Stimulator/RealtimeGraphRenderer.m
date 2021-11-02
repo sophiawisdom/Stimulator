@@ -150,7 +150,7 @@
     
     __block int *block_values = NULL;
     // At default values this takes ~10-15µs, which is fine given our frame budget is ~16000µs
-    // This needs to be very fast.
+    // This needs to be very fast, because there might be several cores spinning while this is waiting.
     [_results readValues:^(_Atomic int * _Nonnull results, int min, int max) {
         size = (max-min) * RESULTS_SPECIFICITY_MULTIPLIER;
         block_values = malloc(size*sizeof(int));

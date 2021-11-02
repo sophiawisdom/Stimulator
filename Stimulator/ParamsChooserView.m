@@ -136,7 +136,7 @@
 }
 
 - (void)update_params {
-    [_delegate setParams:[[ParametersObject alloc] initWithBlocksWide:_params.blocks_wide blocksHigh:_params.blocks_high blockHeight:_params.block_height blockWidth:_params.block_width stoplightTime:_params.stoplight_time streetWidth:_params.street_width policy:_params.policy] andFunction:_policy_name];
+    [_delegate setParams:[[ParametersObject alloc] initWithBlocksWide:_params.blocks_wide blocksHigh:_params.blocks_high blockHeight:_params.block_height blockWidth:_params.block_width stoplightTime:_params.stoplight_time streetWidth:_params.street_width policy:_params.policy policyName:_policy_name]];
 }
 
 - (void)streetWidthChanged {
@@ -183,11 +183,17 @@
     }
 }
 
-- (void)policyChanged:(nonnull NSString *)newPolicy {
+- (void)changeActivePolicy:(nonnull NSString *)newPolicy {
     if (![_policy_name isEqualToString:newPolicy]) {
         _policy_name = newPolicy;
         [self update_params];
     }
+}
+
+- (void)addPolicy:(NSString *)policy withCode:(NSString *)code {
+    _policy_name = policy;
+    [_delegate addPolicy:policy withCode:code];
+    [self update_params];
 }
 
 @end

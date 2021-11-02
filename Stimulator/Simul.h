@@ -10,9 +10,7 @@ struct simul;
 
 typedef PolicyResult (*PolicyFunc)(struct simul * current_state);
 
-#define SPEED_CHECK 0
-
-typedef struct Parameters {
+typedef struct {
     int blocks_wide;
     int blocks_high;
     float block_height;
@@ -27,29 +25,6 @@ typedef struct Parameters {
     long long magic; // detect corruption
 } Parameters;
 
-struct diagnostics {
-    double total_time;
-};
-
-typedef struct fastrand_t {
-    // MWC1616 data
-    
-    int a[4];
-    int b[4];
-    int mask[4];
-    int m1[4];
-    int m2[4];
-    
-    //
-    // Result (4 32-bit random numbers)
-    
-    int res[4];
-    unsigned char used;
-} fastrand;
-
-// per_thread fastrand so we don't have coherency issues
-extern __thread fastrand global_rand;
-
 struct simul {
     Parameters params;
     // simulation -> times[effective_x * simulation -> blocks_high + effective_y]
@@ -60,9 +35,9 @@ struct simul {
     char *calculated;
 
     int current_x; // start at 0, 0
-    bool x_right; // true: we're at the right of the block. false: we're at the left of the block
+    int x_right; // true: we're at the right of the block. false: we're at the left of the block
     int current_y;
-    bool y_top; // true: we're at the top of the block. false: we're at the bottom of the block
+    int y_top; // true: we're at the top of the block. false: we're at the bottom of the block
 
     float cur_t;
     
@@ -70,11 +45,9 @@ struct simul {
     double rand_quotient;
     double twice_stoplight_time;
     double half_stoplight_time;
-    
-    // purpose of having this here is to cache accessing the global_rand variable, because that
-    // takes a lookup.
-    fastrand *rand;
 };
+
+#define SPEED_CHECK 0
 
 double simulate(Parameters params);
 

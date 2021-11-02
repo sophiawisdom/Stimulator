@@ -13,9 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ParametersObject : NSObject {
     @public Parameters _params;
+    @public NSString *_function;
 }
 
-- (instancetype)initWithBlocksWide: (int) blocksWide blocksHigh: (int) blocksHigh blockHeight: (float) blockHeight blockWidth: (float)blockWidth stoplightTime: (float)stoplightTime streetWidth:(float)streetWidth policy: (PolicyFunc) policy;
+- (instancetype)initWithBlocksWide: (int) blocksWide blocksHigh: (int) blocksHigh blockHeight: (float) blockHeight blockWidth: (float)blockWidth stoplightTime: (float)stoplightTime streetWidth:(float)streetWidth policy: (PolicyFunc) policy policyName:(nullable NSString *)function;
 
 + (instancetype)defaultParams;
 

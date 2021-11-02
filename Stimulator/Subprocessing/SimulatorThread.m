@@ -74,38 +74,8 @@ static volatile int thread_num = 0;
     }
 }
 
-fastrand InitFastRand()
-{
-    // Initialize MWC1616 masks and multipliers
-    // Default values of 18000 and 30903 used
-    // for multipliers
-    
-    fastrand f;
-    
-    uint8_t i;
-    
-    for(i=0;i<4;i++) {
-        f.mask[i]=0xFFFF;
-        f.m1[i]=0x4650;
-        f.m2[i]=0x78B7;
-    }
-    
-    f.a[0] = random();
-    f.a[1] = random();
-    f.a[2] = random();
-    f.a[3] = random();
-    f.b[0] = random();
-    f.b[1] = random();
-    f.b[2] = random();
-    f.b[3] = random();
-    f.used = 0;
-    return f;
-}
-
 - (void)simulate { // on _thread's thread
     _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
-    
-    global_rand = InitFastRand();
 
     // Don't know if this is actually working. TODO: check if it works.
     struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
@@ -113,8 +83,7 @@ fastrand InitFastRand()
     int min = _params -> _params.min_time;
     int max = _params -> _params.max_time;
     while (1) {
-        if (self -> _dirty) { // this line takes ~1/1000th of the overall time, not a priority to optimize.
-            // memset(_results_cache, 0, cache_size);
+        if (self -> _dirty) {
             self -> _dirty = false;
             while (!self -> _dirty) {}
             _cache_used = 0;

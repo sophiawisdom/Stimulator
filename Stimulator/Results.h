@@ -26,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock;
 
-- (Response)setParams:(ParametersObject *)newParams function:(NSString *)function;
+- (Response)setParams:(ParametersObject *)newParams;
+- (bool)addPolicy:(NSString *)policy withCode:(NSString *)code;
 
 @end
 

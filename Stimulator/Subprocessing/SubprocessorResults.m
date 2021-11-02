@@ -48,6 +48,7 @@
 - (unsigned long long)writeValues:(nonnull int *)values count:(int)count forParams:(ParametersObject *)params {
     while (_semaphore -> need_read || _dirty) {} // spin if reading. we do this here and not below because
     // setParams sets need_read and changes the params.
+    // TODO: if ^ takes too much of overall time, we could reduce it by allowing callers to check and delay the call for later.
     
     // Is it possible this checks for _dirty, it's false, _dirty is set on setParams, it checks threads_writing, it's 0, then threads_writing is incremented?
     _semaphore -> threads_writing++; // indicate we are writing (so nothing reads)
@@ -62,11 +63,9 @@
         int value = values[i];
         if (value > adjusted_max || value < adjusted_min) {
             _num_results -= 1; // just drop the value on the floor. so what if it's incorrect. get off my back, sjws.
-            /*
             printf("GOT INVALID VALUE %d > max %d\n", values[i]/RESULTS_SPECIFICITY_MULTIPLIER, _max);
             printf("_params is %p, params is %p\n", _params, params);
             exit(1);
-             */
         }
         _backing_arr[value-adjusted_min]++;
     }

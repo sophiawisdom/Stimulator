@@ -11,7 +11,9 @@
 #import "Subprocessor.h"
 #import "RealtimeGraphController.h"
 #include <sys/time.h>
+#include <sys/stat.h>
 #include <x86intrin.h>
+#import "simul_limited_string.h"
 
 memory_object_size_t shared_results_size = max_array_size*sizeof(int)*RESULTS_SPECIFICITY_MULTIPLIER;
 
@@ -41,6 +43,7 @@ semaphore_t allocate_port(task_t child_task, semaphore_t sem) {
     ParametersObject *_params;
     NSString *_name;
     NSString *_code_directory;
+    NSString *_header;
 }
 
 #define MACH_CALL(kret) if (kret != 0) {\
@@ -75,7 +78,8 @@ exit(1);\
         _semaphore -> need_read = false;
         _semaphore -> threads_writing = 0; // how many threads are writing
         
-        _code_directory = NSTemporaryDirectory();
+
+        _code_directory = [NSTemporaryDirectory() stringByAppendingString:@"mistulator/"];
 
         printf("About to fork...\n");
         _child_pid = fork();
@@ -96,6 +100,13 @@ exit(1);\
         printf("allocated port is %d\n", remote_results_sem);
         write(_write_fd, &remote_results_sem, sizeof(remote_results_sem));
         
+        int resp = mkdir([_code_directory UTF8String], 0777);
+        if (resp != 0 && errno != 17) { // errno 17 is file exists, so fine
+            printf("GOT ERROR MAKING DIRECTORY: %d %s\n", errno, strerror(errno));
+        }
+        
+        _header = [NSString stringWithUTF8String:simul_limited_string];
+
         // In practice this means that this object will not be deallocated until the process dies.
         // For the moment, that's fine.
         atexit_b(^{
@@ -105,7 +116,7 @@ exit(1);\
     return self;
 }
 
-- (Response)setParams:(ParametersObject *)newParams function:(nonnull NSString *)function {
+- (Response)setParams:(ParametersObject *)newParams {
     /*
     if ([newParams isEqual:_params] && [function isEqualToString:_name]) {
         return NULL; // nothing to do
@@ -116,15 +127,15 @@ exit(1);\
         exit(1);
     }
 
-    unsigned long function_length = [function lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+    unsigned long function_length = [newParams -> _function lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
     if (function_length > MAX_NAME_LEN) {
+        printf("erroring, function_length is %lu\n", function_length);
         Response resp = {
             .response_type = Error
         };
         return resp;
     }
     _params = newParams;
-    _name = function;
     _max = newParams -> _params.max_time;
     _min = newParams -> _params.min_time;
 
@@ -134,12 +145,34 @@ exit(1);\
             .params = newParams -> _params,
         }
     };
-    memcpy(cmd.params.policy_name, [function UTF8String], function_length);
+    const char * function = [newParams -> _function UTF8String];
+    printf("function is %s. function length is %lu\n", function, function_length);
+    memcpy(cmd.params.policy_name, function, function_length);
+    printf("policy_name is %s\n", cmd.params.policy_name);
     write(_write_fd, &cmd, sizeof(cmd));
-    
+    printf("just wrote...\n");
+
     Response resp;
     read(_read_fd, &resp, sizeof(Response));
+    printf("just read\n");
     return resp;
+}
+
+- (bool)addPolicy:(NSString *)policy withCode:(NSString *)code {
+    if ([policy containsString:@"/"] || [policy lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > MAX_NAME_LEN) {
+        return false;
+    }
+    
+    NSLog(@"writing code %@", code);
+    
+    NSString *dest = [_code_directory stringByAppendingFormat:@"%@.c", policy];
+    NSError *err;
+    NSString *appended_string = [[_header stringByAppendingString:code] stringByReplacingOccurrencesOfString:@";" withString:@";\n"];
+    [appended_string writeToFile:dest atomically:false encoding:NSUTF8StringEncoding error:&err];
+    if (err) {
+        NSLog(@"got err while writing data: %@ to dest %@", err, dest);
+    }
+    return true;
 }
 
 - (void)readValues:(void (^)(_Atomic int * _Nonnull, int, int))readBlock {

@@ -6,37 +6,6 @@
 #include <string.h>
 #include "Simul.h"
 #include <x86intrin.h>
-
-static inline void FastRand(fastrand *f)
-{
-    __m128i a = _mm_load_si128((const __m128i *)f->a);
-    __m128i b = _mm_load_si128((const __m128i *)f->b);
-    
-    const __m128i mask = _mm_load_si128((const __m128i *)f->mask);
-    const __m128i m1 = _mm_load_si128((const __m128i *)f->m1);
-    const __m128i m2 = _mm_load_si128((const __m128i *)f->m2);
-    
-    __m128i amask = _mm_and_si128(a, mask);
-    __m128i ashift = _mm_srli_epi32(a, 0x10);
-    __m128i amul = _mm_mullo_epi32(amask, m1);
-    __m128i anew = _mm_add_epi32(amul, ashift);
-    _mm_store_si128((__m128i *)f->a, anew);
-    
-    __m128i bmask = _mm_and_si128(b, mask);
-    __m128i bshift = _mm_srli_epi32(b, 0x10);
-    __m128i bmul = _mm_mullo_epi32(bmask, m2);
-    __m128i bnew = _mm_add_epi32(bmul, bshift);
-    _mm_store_si128((__m128i *)f->b, bnew);
-    
-    __m128i bmasknew = _mm_and_si128(bnew, mask);
-    __m128i ashiftnew = _mm_slli_epi32(anew, 0x10);
-    __m128i res = _mm_add_epi32(ashiftnew, bmasknew);
-    _mm_store_si128((__m128i *)f->res, res);
-    
-    f -> used = 0;
-}
-
-__thread fastrand global_rand;
  
 // How long is the stoplight's cycle time
 static double get_stoplight_time(struct simul *simulation, int x, int y) {
@@ -44,9 +13,6 @@ static double get_stoplight_time(struct simul *simulation, int x, int y) {
     int index = x * simulation->params.blocks_high + y;
     // the existence of the cache saves us ~500ns/simulate()
     if (simulation->times[index] == 0) {
-        if (simulation -> rand -> used == 4) {
-            FastRand(simulation -> rand);
-        }
         // value from stoplight_time/2 to 3*stoplight_time/2
         double value = (double)random()/*global_rand.res[global_rand.used++]*//(double)(simulation->rand_quotient) + simulation->half_stoplight_time;
         simulation->times[index] = value;
@@ -87,13 +53,21 @@ static double stoplight_wait(struct simul *simulation, PolicyResult direction) {
     }
 }
 
+bool on_top_edge(struct simul *simulation) {
+    return simulation -> current_y+1 == simulation -> params.blocks_high && simulation -> y_top;
+}
+    
+bool on_right_edge(struct simul *simulation) {
+    return simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right;
+}
+
 __attribute__((noinline)) bool step_simul(struct simul *simulation) {
     PolicyResult response;
-    if (simulation -> current_y+1 == simulation -> params.blocks_high && simulation -> y_top) {
-        response = Right; // we're at the top edge
+    if (on_top_edge(simulation)) {
+        response = Right;
     }
-    else if (simulation -> current_x+1 == simulation -> params.blocks_wide && simulation -> x_right) {
-        response = Top; // we're at the right edge
+    else if (on_right_edge(simulation)) {
+        response = Top;
     } else {
         response = simulation -> params.policy(simulation); // default path
     }
@@ -123,10 +97,7 @@ __attribute__((noinline)) bool step_simul(struct simul *simulation) {
         return false;
     }
 
-    if ((simulation -> current_x + 1) == simulation -> params.blocks_wide &&
-        (simulation -> current_y + 1) == simulation -> params.blocks_high &&
-        simulation -> x_right &&
-        simulation -> y_top) {
+    if (on_top_edge(simulation) && on_right_edge(simulation)) {
         return false; // we've reached our destination
     }
 
@@ -301,8 +272,6 @@ double simulate(Parameters params) {
     // int calculated_size = (area >> 3)+((area&7) != 0); // /8, rounded up
 
     simulation -> times = calloc(sizeof(float), area);
-    
-    simulation -> rand = &global_rand;
 
     if (!simulation -> params.policy) {
        simulation -> params.policy = default_policy;
@@ -318,19 +287,6 @@ double simulate(Parameters params) {
 
     return retval;
 }
-
-/*
- int blocks_wide;
- int blocks_high;
- float block_height;
- float block_width;
- float stoplight_time;
- float street_width;
- PolicyFunc policy;
-
- int max_time;
- int min_time;
- */
 
 char *parameters_description(Parameters *params) {
     char *out = NULL;

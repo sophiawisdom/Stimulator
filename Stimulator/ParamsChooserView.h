@@ -14,7 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ParamsReceiver <NSObject>
 
-- (void)setParams:(ParametersObject *)params andFunction:(nonnull NSString *)function;
+- (void)setParams:(ParametersObject *)params;
+- (void)addPolicy:(NSString *)policy withCode:(NSString *)code;
 
 @end
 

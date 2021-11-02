@@ -13,12 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol PolicyReceiver <NSObject>
 
-- (void)policyChanged: (NSString *)newPolicy;
+- (void)changeActivePolicy: (NSString *)newPolicy;
 - (void)addPolicy: (NSString *)policy withCode:(NSString *)code; // add a user-defined policy to the list
+- (void)modifyPolicy: (NSString *)policy withCode:(NSString *)code;
 
 @end
 
-@interface PolicyChooserView : NSView
+@interface PolicyChooserView : NSView<NSTextViewDelegate>
 
 - (instancetype)initWithFrame:(NSRect)frame andDelegate:(id<PolicyReceiver>)delegate;
 

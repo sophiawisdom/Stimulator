@@ -22,6 +22,4 @@ static const long max_results = 1000*1000*1000; // max number of simulations we 
 
 @end
 
-fastrand InitFastRand(void);
-
 NS_ASSUME_NONNULL_END
