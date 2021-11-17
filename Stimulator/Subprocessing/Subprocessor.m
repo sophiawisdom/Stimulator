@@ -57,7 +57,8 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
     for (int i = 0; i < 4; i++) {
         [symbols addObject:[NSString stringWithUTF8String:policies[i]]];
     }
-    NSLog(@"symbols are %@", symbols);
+    
+    // NSMutableArray<NSNumber *> *nums = [[NSMutableArray alloc] initWithCapacity:500];
 
     Response resp;
     Command *read_buffer = calloc(1, MAX_BUFFER_SIZE);
@@ -77,6 +78,7 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
             NSString *policy_name = [NSString stringWithUTF8String:read_buffer -> params.policy_name];
             if (![symbols containsObject:policy_name]) {
                 addSymbol(policy_name, code_dir);
+                [symbols addObject:policy_name];
             }
             PolicyFunc policy_func = dlsym(RTLD_DEFAULT, read_buffer -> params.policy_name);
             if (policy_func == NULL) {
@@ -84,11 +86,29 @@ int run_subprocess(int read_fd, int write_fd, int num_threads, _Atomic int *shar
                 resp.response_type = Error;
                 sprintf(resp.error, "Could not find function named %s: %s\n", read_buffer -> params.policy_name, dlerror());
             } else {
+                semaphore_count -> need_read = true;
+                while (semaphore_count -> threads_writing) {}
                 ParametersObject *newParams = [[ParametersObject alloc] initWithBlocksWide:params.blocks_wide blocksHigh:params.blocks_high blockHeight:params.block_height blockWidth:params.block_width stoplightTime:params.stoplight_time streetWidth:params.street_width policy:policy_func policyName:nil];
                 [results setParams:newParams];
+                /*
+                struct timeval before;
+                gettimeofday(&before, NULL);
+                 */
                 [threadpool enumerateObjectsUsingBlock:^(SimulatorThread * _Nonnull thread, NSUInteger idx, BOOL * _Nonnull stop) {
                     [thread newParams:newParams];
                 }];
+                semaphore_count -> need_read = false;
+                /*
+                struct timeval after;
+                gettimeofday(&after, NULL);
+                unsigned long long diff = ((after.tv_sec*1000000) + after.tv_usec) - ((before.tv_sec * 1000000) + before.tv_usec);
+                [nums addObject:[[NSNumber alloc] initWithUnsignedLongLong:diff]];
+                __block unsigned long long total = 0;
+                [nums enumerateObjectsUsingBlock:^(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    total += [obj unsignedLongLongValue];
+                }];
+                // printf("Took %llu µs to change params. average is %llu\n", diff, total/[nums count]);
+                 */
             }
         } else if (read_buffer -> type_thing == Shutdown) {
             exit(1);

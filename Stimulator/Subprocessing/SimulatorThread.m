@@ -7,9 +7,9 @@
 //
 
 #import "SimulatorThread.h"
-#import "Results.h"
+#include "signal.h"
 
-static const int cache_size = 500;
+static const int cache_size = 5;
 
 @implementation SimulatorThread {
     NSThread *_thread;
@@ -21,9 +21,11 @@ static const int cache_size = 500;
     int _thread_num;
     
     _Atomic bool _dirty;
+    _Atomic bool _suspended;
+    _Atomic bool _reading;
 }
 
-static volatile int thread_num = 0;
+static volatile _Atomic int thread_num = 0;
 
 - (instancetype)initWithResults: (SubprocessorResults *)results
 {
@@ -36,6 +38,7 @@ static volatile int thread_num = 0;
         _thread.name = [NSString stringWithFormat:@"SimulatorThread #%d", _thread_num];
         _thread.qualityOfService = NSQualityOfServiceBackground;
         _dirty = false;
+        _suspended = false;
     }
     return self;
 }
@@ -46,14 +49,14 @@ static volatile int thread_num = 0;
         _params = params;
         [_thread start];
         return;
-    } else if (_thread_port) { // wake thread up if it's been suspended
+    } else if (_thread_port && _suspended) { // wake thread up if it's been suspended
+        _suspended = false;
         thread_resume(_thread_port);
     }
-
-    self -> _dirty = true;
-    while (self -> _dirty) {} // wait for simulation thread to see change, upon which time it will set _dirty to false
+    
+    while (_reading) {}
     _params = params;
-    self -> _dirty = true; // we're done executing and the simulation thread can go
+    self -> _dirty = true;
 }
 
 - (void)dealloc
@@ -62,37 +65,43 @@ static volatile int thread_num = 0;
     mach_port_deallocate(mach_task_self(), _thread_port); // mach_thread_self() allocates a port, unlike mach_task_self()
 }
 
-- (void)flush_cache {
-    long long total_written = [_results writeValues:self->_results_cache count:_cache_used forParams:_params];
+- (void)writeForParams:(ParametersObject *)params {
+    long long total_written = [_results writeValues:self->_results_cache count:_cache_used forParams:params];
+
     _cache_used = 0;
     if (total_written == -1 || total_written > max_results) {
         // If we've already written enough, put the thread in hibernation until the parameters change.
         // Another option instead of this would be to use something like [NSThread sleepForTimeInterval]
         // but I thought this would be lower-latency, and more accurately describes the intended semantics
         // ("sleep until something's changed").
+        _suspended = true;
         thread_suspend(_thread_port);
     }
 }
 
 - (void)simulate { // on _thread's thread
-    _thread_port = mach_thread_self(); /* leaks a thread port, but who cares lol */
+    _thread_port = mach_thread_self();
 
     // Don't know if this is actually working. TODO: check if it works.
     struct thread_affinity_policy policy = {.affinity_tag=_thread_num};
     thread_policy_set(_thread_port, THREAD_AFFINITY_POLICY, &policy, THREAD_AFFINITY_POLICY_COUNT);
     int min = _params -> _params.min_time;
     int max = _params -> _params.max_time;
+    Parameters params = _params -> _params;
+    ParametersObject *cur_params = _params;
+
     while (1) {
         if (self -> _dirty) {
+            self -> _reading = true;
             self -> _dirty = false;
-            while (!self -> _dirty) {}
             _cache_used = 0;
             min = _params -> _params.min_time;
             max = _params -> _params.max_time;
-            self -> _dirty = false;
+            params = _params -> _params;
+            cur_params = _params;
+            self -> _reading = false;
         }
 
-        Parameters params = _params -> _params;
         double result = simulate(params);
 
         if (result < params.min_time || result > params.max_time) {
@@ -101,8 +110,8 @@ static volatile int thread_num = 0;
         }
 
         _results_cache[_cache_used++] = result * RESULTS_SPECIFICITY_MULTIPLIER;
-        if (_cache_used >= cache_size) {
-            [self flush_cache];
+        if (_cache_used == cache_size && !self -> _dirty) {
+            [self writeForParams:cur_params];
         }
     }
 }

@@ -146,15 +146,11 @@ exit(1);\
         }
     };
     const char * function = [newParams -> _function UTF8String];
-    printf("function is %s. function length is %lu\n", function, function_length);
     memcpy(cmd.params.policy_name, function, function_length);
-    printf("policy_name is %s\n", cmd.params.policy_name);
     write(_write_fd, &cmd, sizeof(cmd));
-    printf("just wrote...\n");
 
     Response resp;
     read(_read_fd, &resp, sizeof(Response));
-    printf("just read\n");
     return resp;
 }
 

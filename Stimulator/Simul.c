@@ -278,7 +278,7 @@ double simulate(Parameters params) {
     }
 
     // run out the simulation
-    while (step_simul(simulation)){}
+    while (step_simul(simulation)) {}
     
     double retval = simulation -> cur_t;
 

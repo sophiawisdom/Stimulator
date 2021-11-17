@@ -14,7 +14,7 @@
     _Atomic unsigned long long _num_results;
     shmem_semaphore *_semaphore;
     
-    _Atomic bool _dirty;
+    _Atomic bool _setting_params;
     
     _Atomic int _min;
     _Atomic int _max;
@@ -29,30 +29,37 @@
         _backing_arr = arr;
         _num_results = 0;
         _semaphore = semaphore;
+        _setting_params = false;
     }
     return self;
 }
 
 - (void)setParams:(ParametersObject *)params {
-    _dirty = true;
-    while (_semaphore -> threads_writing) {}
-    
+    _setting_params = true;
+    while (_semaphore -> threads_writing) {} // acquire lock
+
     _params = (unsigned long long)params;
     _min = params -> _params.min_time;
     _max = params -> _params.max_time;
     memset(_backing_arr, 0, max_array_size*RESULTS_SPECIFICITY_MULTIPLIER*sizeof(int));
 
-    _dirty = false;
+    _setting_params = false;
 }
 
 - (unsigned long long)writeValues:(nonnull int *)values count:(int)count forParams:(ParametersObject *)params {
-    while (_semaphore -> need_read || _dirty) {} // spin if reading. we do this here and not below because
-    // setParams sets need_read and changes the params.
-    // TODO: if ^ takes too much of overall time, we could reduce it by allowing callers to check and delay the call for later.
+    if (params != _params) {
+        // printf("initial BAD _PARAMS: got %p expected %p\n", params, _params);
+        return 0;
+    }
     
+    // with cache_size=5, approximately 2-3% of total SimulatorThread time is spent in writeValues. If this was more optimized, we could potentially write each value as it comes in.
+    while (_semaphore -> need_read || _setting_params) {} // spin if reading. we do this here and not below because
+    // setParams sets need_read and changes the params.
+
     // Is it possible this checks for _dirty, it's false, _dirty is set on setParams, it checks threads_writing, it's 0, then threads_writing is incremented?
     _semaphore -> threads_writing++; // indicate we are writing (so nothing reads)
     if (params != _params) { // the params object hasn't percolated through yet, so drop these on the floor. TODO: should we do more in-depth comparisons?
+        // printf("subsequent BAD _PARAMS: got %p expected %p\n", params, _params);
         _semaphore -> threads_writing--;
         return 0;
     }
