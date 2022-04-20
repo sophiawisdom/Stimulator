@@ -1,19 +1,19 @@
 **Project overview**
-In a manhattan distance world, all paths between point A and point B are the same. If you add traffic lights into this equation, things become more complex. In terms of distance, all paths are still the same, but in terms of time, some paths will have less waiting time than others. This project was originally an attempt to prove to myself what the optimal policy is for walking in such a world, and how much time such a policy would save over a naive policy.
+
+In a [manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry) world, all paths between point A and point B have the same length. If you add traffic lights into this equation, things become more complex. In terms of distance, all paths are still the same, but in terms of time, some paths will have less waiting time than others. An additional point is that instead of having all knowledge ahead of time, we learn new information as we go (the state of traffic lights we haven't yet seen). The question this project is (ostensibly) trying to answer is the best algorithm for dynamically creating a path as we gain more information.
+
+My primary conclusion after a bit of fooling around is that the best algorithm (or at least a good one) is [faster_policy](https://github.com/sophiawisdom/Stimulator/blob/master/Stimulator/Simul.c#L172). The goal of this algorithm is to 1) try to go wherever the stoplight is green but 2) try to stay approximately on a diagonal line between our origin and our destination. These are often in conflict, but it uses a simple rule to decide when we are too far off the diagonal and should wait at a stoplight to get back closer. The theory here is that if we get too far off the diagonal path, we're likely to get stuck at the edges, where we no longer have freedom to maneuver and are thus very slow. So we try to preserve as much freedom as we can.
 
 **Technical Details**
-The simulation is totally contained within `simul.c`.  The rest of the project is about giving the user knobs to tweak the simulation and exposing the results as quickly as possible.
 
-The simulation was deliberately made to be as simple as possible, in order to improve performance. This enables use-cases like moving a slider and seeing new simulation results on every frame.
-
-The `Parameters` struct in `simul.h` defines the parameters to the simulation. The crucial function is `simulate()` which takes a `Parameters` struct and returns the time taken.
+The simulation is totally contained within `simul.c`.  The rest of the project is about giving the user knobs to tweak the simulation and exposing the results as quickly as possible. The simulation was deliberately made to be as simple as possible, in order to improve performance. This enables use-cases like moving a slider and seeing new simulation results on every frame. The `Parameters` struct in `simul.h` defines the parameters to the simulation. The crucial function is `simulate()` which takes a `Parameters` struct and returns the time taken.
 
 The mental model of the simulation is that we are in a manhattan distance world, `blocks_wide` blocks wide and `blocks_high` blocks high, where each block has a y distance of `block_height` and an x distance of  `block_width` wide. We start at the bottom-left corner of block (0, 0) and need to go to the top-right corner of block (`blocks_high`, `blocks_wide`). Because we are going from the bottom-left to the top-right, there are only two directions we can go: `Top` or `Right`. Every time we have to make a decision on where to go, we call a `policy` function, which takes the current state and decides whether to go `Top` or `Right`. Sometimes, the policy will have to wait at a stoplight. The goal of creating this simulation is to find the policy that does this the least.
+
+It is immensely important for choosing the algorithm the assumptions we make around when stoplights change. If we assume that stoplights are all random (for several values of "random"), none of the parameters matter. It's all normally distributed and the correct solution is the "Avoid waiting" policy described below. As stands, the stoplights are implemented as having 1) a global cycle time `stoplight_time` and 2) a per-intersection value from `stoplight_time/2` to `stoplight_time*3/2`. The entire system cycles every `stoplight_time*2` seconds in the simulation. Every stoplight is green going `Top` from 0 to the per-intersection value and then green going `Red` from the per-intersection value to `stoplight_time*2`. This means that there are nice "harmonics" in how the various parameters and the policies can be set up together.
 
 Currently there are three policies implemented:
 * Default policy: Go `Top` until we can't anymore, then go `Right`
 * Avoid waiting policy: Go `Top` if that light is green, otherwise go `Right`
 * Faster policy: Same as avoid waiting policy, but attempt to stay on an approximately diagonal path so as to reduce the likelihood we get stuck along the edges.
-
-
-
+* TODO: maybe faster policy? If the faster policy is say going from (0, 0) to (50, 10) and finds itself at (40, 10) it shouldn't try to get on a diagonal line from the source but instead just try to stay on the diagonal line from its current point.
