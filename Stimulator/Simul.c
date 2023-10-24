@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include "Simul.h"
-#include <x86intrin.h>
+// #include <x86intrin.h>
  
 // How long is the stoplight's cycle time
 static double get_stoplight_time(struct simul *simulation, int x, int y) {
@@ -14,7 +14,7 @@ static double get_stoplight_time(struct simul *simulation, int x, int y) {
     // the existence of the cache saves us ~500ns/simulate()
     if (simulation->times[index] == 0) {
         // value from stoplight_time/2 to 3*stoplight_time/2
-        double value = (double)random()/*global_rand.res[global_rand.used++]*//(double)(simulation->rand_quotient) + simulation->half_stoplight_time;
+        double value = (double)random()/(double)(simulation->rand_quotient) + simulation->half_stoplight_time;
         simulation->times[index] = value;
         return value;
     }

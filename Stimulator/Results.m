@@ -12,7 +12,7 @@
 #import "RealtimeGraphController.h"
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <x86intrin.h>
+// #include <x86intrin.h>
 #import "simul_limited_string.h"
 
 memory_object_size_t shared_results_size = max_array_size*sizeof(int)*RESULTS_SPECIFICITY_MULTIPLIER;

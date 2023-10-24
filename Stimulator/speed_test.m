@@ -16,9 +16,7 @@
 int main() {
     Parameters params = [ParametersObject defaultParams] -> _params;
     srandomdev();
-    
-    global_rand = InitFastRand();
-    
+
     printf("beginning simulation... ch-ch-ch change please\n");
     
     struct thread_affinity_policy policy = {.affinity_tag=0};
